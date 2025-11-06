@@ -10,7 +10,7 @@ interface AIState {
 
   // Actions
   setCurrentFeedback: (feedback: string) => void
-  submitFeedback: (feedback: string) => Promise<void>
+  submitFeedback: (feedback: string, customName?: string) => Promise<void>
   generateStyle: (stylePrompt: string) => Promise<StylePreset>
   setGenerating: (isGenerating: boolean) => void
   addToHistory: (feedback: AIFeedback) => void
@@ -26,40 +26,40 @@ function generateMockStyle(prompt: string): StylePreset {
 
   if (lowercasePrompt.includes('minimal') || lowercasePrompt.includes('simple')) {
     categoryMappings = {
-      Language: 'box',
-      Framework: 'box',
-      Database: 'box',
-      Tools: 'box'
+      Language: 'box' as GeometryType,
+      Framework: 'box' as GeometryType,
+      Database: 'box' as GeometryType,
+      Tools: 'box' as GeometryType
     }
   } else if (lowercasePrompt.includes('futuristic') || lowercasePrompt.includes('modern')) {
     categoryMappings = {
-      Language: 'cone',
-      Framework: 'torus',
-      Database: 'sphere',
-      Tools: 'cylinder'
+      Language: 'cone' as GeometryType,
+      Framework: 'torus' as GeometryType,
+      Database: 'sphere' as GeometryType,
+      Tools: 'cylinder' as GeometryType
     }
   } else if (lowercasePrompt.includes('organic') || lowercasePrompt.includes('natural')) {
     categoryMappings = {
-      Language: 'sphere',
-      Framework: 'sphere',
-      Database: 'torus',
-      Tools: 'sphere'
+      Language: 'sphere' as GeometryType,
+      Framework: 'sphere' as GeometryType,
+      Database: 'torus' as GeometryType,
+      Tools: 'sphere' as GeometryType
     }
   } else if (lowercasePrompt.includes('angular') || lowercasePrompt.includes('sharp')) {
     categoryMappings = {
-      Language: 'cone',
-      Framework: 'box',
-      Database: 'cone',
-      Tools: 'cone'
+      Language: 'cone' as GeometryType,
+      Framework: 'box' as GeometryType,
+      Database: 'cone' as GeometryType,
+      Tools: 'cone' as GeometryType
     }
   } else {
     // Random style
     const geometries: GeometryType[] = ['box', 'sphere', 'cylinder', 'cone', 'torus']
     categoryMappings = {
-      Language: geometries[Math.floor(Math.random() * geometries.length)],
-      Framework: geometries[Math.floor(Math.random() * geometries.length)],
-      Database: geometries[Math.floor(Math.random() * geometries.length)],
-      Tools: geometries[Math.floor(Math.random() * geometries.length)]
+      Language: (geometries[Math.floor(Math.random() * geometries.length)] || 'box') as GeometryType,
+      Framework: (geometries[Math.floor(Math.random() * geometries.length)] || 'box') as GeometryType,
+      Database: (geometries[Math.floor(Math.random() * geometries.length)] || 'box') as GeometryType,
+      Tools: (geometries[Math.floor(Math.random() * geometries.length)] || 'box') as GeometryType
     }
   }
 
@@ -82,14 +82,19 @@ export const useAIStore = create<AIState>((set, get) => ({
 
   setCurrentFeedback: (feedback) => set({ currentFeedback: feedback }),
 
-  submitFeedback: async (feedback) => {
+  submitFeedback: async (feedback, customName) => {
     set({ isGenerating: true })
 
     // Simulate AI generation
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    // Generate meaningful name based on prompt
-    const generateAssetName = (prompt: string): string => {
+    // Generate meaningful name based on prompt or use custom name
+    const generateAssetName = (prompt: string, custom?: string): string => {
+      // If custom name provided, use it
+      if (custom) {
+        return custom
+      }
+
       const lowercasePrompt = prompt.toLowerCase()
 
       // Extract key words
@@ -105,8 +110,9 @@ export const useAIStore = create<AIState>((set, get) => ({
 
       // Default: use first meaningful word + "Object"
       const words = prompt.split(' ').filter(w => w.length > 3)
-      if (words.length > 0) {
-        return `AI ${words[0].charAt(0).toUpperCase() + words[0].slice(1)} Object`
+      if (words.length > 0 && words[0]) {
+        const firstWord = words[0]
+        return `AI ${firstWord.charAt(0).toUpperCase() + firstWord.slice(1)} Object`
       }
 
       return 'AI Custom Object'
@@ -127,7 +133,7 @@ export const useAIStore = create<AIState>((set, get) => ({
     const mockGeneratedAssets: Asset[] = [
       {
         id: `ai-${Date.now()}-1`,
-        name: generateAssetName(feedback),
+        name: generateAssetName(feedback, customName),
         category: 'AI Generated',
         tags: ['ai', 'generated', feedback.toLowerCase()],
         thumbnail: '✨',

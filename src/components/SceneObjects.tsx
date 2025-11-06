@@ -8,8 +8,8 @@ import { Text } from '@react-three/drei'
 function SceneObjectMesh({ object }: { object: SceneObject }) {
   const { selectObject, selectedObjectIds, updateObject, objects, sceneSettings } = useSceneStore()
   const isSelected = selectedObjectIds.includes(object.id)
-  const [isDragging, setIsDragging] = useState(false)
-  const { camera, raycaster, pointer, gl } = useThree()
+  const [, setIsDragging] = useState(false)
+  const { raycaster, gl } = useThree()
   const dragPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.5))
   const dragOffset = useRef(new THREE.Vector3())
   const mouseDownPos = useRef<THREE.Vector2 | null>(null)
@@ -104,12 +104,13 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
     mouseDownPos.current = null
     hasMoved.current = false
 
-    // Re-enable orbit controls after interaction
-    // @ts-ignore
-    gl.domElement.dataset.isDragging = 'false'
-
-    // @ts-ignore
-    gl.domElement.style.cursor = 'auto'
+    // Re-enable orbit controls after a small delay to prevent unwanted rotation
+    setTimeout(() => {
+      // @ts-ignore
+      gl.domElement.dataset.isDragging = 'false'
+      // @ts-ignore
+      gl.domElement.style.cursor = 'auto'
+    }, 50)
   }
 
   const material = object.materialProps ? (
@@ -132,7 +133,6 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerMissed={handlePointerUp}
     >
       <mesh
         visible={object.visible}
@@ -252,8 +252,15 @@ function renderGeometry(object: SceneObject) {
 export default function SceneObjects() {
   const { objects, clearSelection } = useSceneStore()
 
+  const handleBackgroundClick = (e: any) => {
+    // Only clear selection if clicking on background (not on an object)
+    if (e.eventObject === e.object) {
+      clearSelection()
+    }
+  }
+
   return (
-    <group onClick={() => clearSelection()}>
+    <group onClick={handleBackgroundClick}>
       {objects.map((object) => (
         <SceneObjectMesh key={object.id} object={object} />
       ))}
