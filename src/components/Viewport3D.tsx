@@ -1,9 +1,39 @@
-import { Canvas } from '@react-three/fiber'
+import { useRef, useEffect } from 'react'
+import { Canvas, useThree } from '@react-three/fiber'
 import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei'
 import { useSceneStore } from '../stores/sceneStore'
 import SceneObjects from './SceneObjects'
 import TransformControls from './TransformControls'
 import CameraController from './CameraController'
+
+function OrbitControlsWrapper() {
+  const controlsRef = useRef<any>(null)
+  const { gl } = useThree()
+
+  useEffect(() => {
+    const checkDragging = () => {
+      if (controlsRef.current) {
+        // @ts-ignore
+        const isDragging = gl.domElement.dataset.isDragging === 'true'
+        controlsRef.current.enabled = !isDragging
+      }
+    }
+
+    const intervalId = setInterval(checkDragging, 50)
+    return () => clearInterval(intervalId)
+  }, [gl])
+
+  return (
+    <OrbitControls
+      ref={controlsRef}
+      makeDefault
+      enableDamping
+      dampingFactor={0.05}
+      minDistance={2}
+      maxDistance={50}
+    />
+  )
+}
 
 export default function Viewport3D() {
   const { sceneSettings } = useSceneStore()
@@ -54,13 +84,7 @@ export default function Viewport3D() {
         <TransformControls />
 
         {/* Camera Controls */}
-        <OrbitControls
-          makeDefault
-          enableDamping
-          dampingFactor={0.05}
-          minDistance={2}
-          maxDistance={50}
-        />
+        <OrbitControlsWrapper />
 
         {/* Camera View Controller */}
         <CameraController />

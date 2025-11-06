@@ -43,6 +43,13 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
     setIsDragging(true)
     selectObject(object.id, e.shiftKey)
 
+    // Disable orbit controls during drag
+    const controls = gl.domElement.parentElement?.querySelector('canvas')
+    if (controls) {
+      // @ts-ignore
+      gl.domElement.dataset.isDragging = 'true'
+    }
+
     // Calculate offset from object center to intersection point
     const intersection = new THREE.Vector3()
     raycaster.ray.intersectPlane(dragPlane.current, intersection)
@@ -78,6 +85,11 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
   const handlePointerUp = (e: any) => {
     e.stopPropagation()
     setIsDragging(false)
+
+    // Re-enable orbit controls after drag
+    // @ts-ignore
+    gl.domElement.dataset.isDragging = 'false'
+
     // @ts-ignore
     gl.domElement.style.cursor = 'auto'
   }
@@ -105,13 +117,13 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       position={[object.position.x, object.position.y, object.position.z]}
       rotation={[object.rotation.x, object.rotation.y, object.rotation.z]}
       scale={[object.scale.x, object.scale.y, object.scale.z]}
+      onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerMissed={handlePointerUp}
     >
       <mesh
-        onClick={handleClick}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerMissed={handlePointerUp}
         visible={object.visible}
         castShadow
         receiveShadow
@@ -151,6 +163,22 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
           anchorY="middle"
         >
           {object.thumbnail}
+        </Text>
+      )}
+
+      {/* Top Text Label (for aerial view, below emoji) */}
+      {object.displayText && (
+        <Text
+          position={[0, 0.8, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.25}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.015}
+          outlineColor="#000000"
+        >
+          {object.displayText}
         </Text>
       )}
 
