@@ -14,6 +14,7 @@ export interface SceneObject {
   geometryParams?: Record<string, any>
   displayText?: string
   thumbnail?: string
+  category?: string
 }
 
 export interface MaterialProperties {

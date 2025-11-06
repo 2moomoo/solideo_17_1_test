@@ -1,5 +1,23 @@
 import { create } from 'zustand'
-import type { SceneObject, SceneSettings, TransformMode } from '../types'
+import type { SceneObject, SceneSettings, TransformMode, StylePreset, GeometryType } from '../types'
+
+// Helper function to get geometry params based on type
+function getGeometryParams(geometryType: GeometryType): Record<string, any> {
+  switch (geometryType) {
+    case 'sphere':
+      return { radius: 0.6, widthSegments: 32, heightSegments: 32 }
+    case 'cylinder':
+      return { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 }
+    case 'box':
+      return { width: 1, height: 1, depth: 1 }
+    case 'cone':
+      return { radius: 0.6, height: 1, radialSegments: 32 }
+    case 'torus':
+      return { radius: 0.5, tube: 0.2, radialSegments: 16, tubularSegments: 100 }
+    default:
+      return { width: 1, height: 1, depth: 1 }
+  }
+}
 
 interface SceneState {
   objects: SceneObject[]
@@ -17,6 +35,7 @@ interface SceneState {
   updateSceneSettings: (settings: Partial<SceneSettings>) => void
   duplicateObject: (id: string) => void
   autoLayout: () => void
+  applyStyleToObjects: (style: StylePreset) => void
 }
 
 export const useSceneStore = create<SceneState>((set) => ({
@@ -125,5 +144,25 @@ export const useSceneStore = create<SceneState>((set) => ({
     return {
       objects: layoutedObjects
     }
+  }),
+
+  applyStyleToObjects: (style) => set((state) => {
+    // Update objects with new geometry based on style
+    const updatedObjects = state.objects.map(obj => {
+      if (!obj.category) return obj
+
+      const category = obj.category as keyof typeof style.categoryMappings
+      if (category in style.categoryMappings) {
+        const newGeometryType = style.categoryMappings[category]
+        return {
+          ...obj,
+          geometryType: newGeometryType,
+          geometryParams: getGeometryParams(newGeometryType)
+        }
+      }
+      return obj
+    })
+
+    return { objects: updatedObjects }
   })
 }))

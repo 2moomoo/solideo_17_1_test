@@ -88,18 +88,54 @@ export const useAIStore = create<AIState>((set, get) => ({
     // Simulate AI generation
     await new Promise(resolve => setTimeout(resolve, 2000))
 
+    // Generate meaningful name based on prompt
+    const generateAssetName = (prompt: string): string => {
+      const lowercasePrompt = prompt.toLowerCase()
+
+      // Extract key words
+      if (lowercasePrompt.includes('building')) return 'AI Building'
+      if (lowercasePrompt.includes('tree') || lowercasePrompt.includes('nature')) return 'AI Tree'
+      if (lowercasePrompt.includes('car') || lowercasePrompt.includes('vehicle')) return 'AI Vehicle'
+      if (lowercasePrompt.includes('furniture') || lowercasePrompt.includes('chair') || lowercasePrompt.includes('table')) return 'AI Furniture'
+      if (lowercasePrompt.includes('abstract')) return 'AI Abstract'
+      if (lowercasePrompt.includes('vintage') || lowercasePrompt.includes('retro')) return 'AI Vintage Object'
+      if (lowercasePrompt.includes('futuristic') || lowercasePrompt.includes('modern')) return 'AI Modern Object'
+      if (lowercasePrompt.includes('wood')) return 'AI Wooden Object'
+      if (lowercasePrompt.includes('metal')) return 'AI Metal Object'
+
+      // Default: use first meaningful word + "Object"
+      const words = prompt.split(' ').filter(w => w.length > 3)
+      if (words.length > 0) {
+        return `AI ${words[0].charAt(0).toUpperCase() + words[0].slice(1)} Object`
+      }
+
+      return 'AI Custom Object'
+    }
+
+    // Determine geometry type based on prompt
+    const geometryType = (() => {
+      const lowercasePrompt = feedback.toLowerCase()
+      if (lowercasePrompt.includes('round') || lowercasePrompt.includes('ball') || lowercasePrompt.includes('sphere')) return 'sphere'
+      if (lowercasePrompt.includes('box') || lowercasePrompt.includes('cube')) return 'box'
+      if (lowercasePrompt.includes('cylinder') || lowercasePrompt.includes('tube') || lowercasePrompt.includes('pillar')) return 'cylinder'
+      if (lowercasePrompt.includes('cone') || lowercasePrompt.includes('pyramid')) return 'cone'
+      if (lowercasePrompt.includes('torus') || lowercasePrompt.includes('donut') || lowercasePrompt.includes('ring')) return 'torus'
+      return 'box' // default
+    })()
+
     // Mock AI response with generated assets
     const mockGeneratedAssets: Asset[] = [
       {
         id: `ai-${Date.now()}-1`,
-        name: 'AI Generated Object 1',
+        name: generateAssetName(feedback),
         category: 'AI Generated',
         tags: ['ai', 'generated', feedback.toLowerCase()],
         thumbnail: '✨',
         description: `Generated based on: "${feedback}"`,
-        geometryType: 'box',
+        geometryType,
         aiGenerated: true,
-        aiPrompt: feedback
+        aiPrompt: feedback,
+        color: '#9333ea' // purple for AI generated
       }
     ]
 

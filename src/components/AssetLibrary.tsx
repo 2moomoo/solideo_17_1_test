@@ -33,6 +33,7 @@ export default function AssetLibrary() {
       geometryParams: asset.geometryParams,
       displayText: asset.displayText || asset.name,
       thumbnail: asset.thumbnail,
+      category: asset.category,
       materialProps: {
         color: asset.color || '#3b82f6',
         metalness: 0.3,

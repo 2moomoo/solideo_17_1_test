@@ -44,12 +44,8 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
     e.stopPropagation()
 
     // Store mouse down position
-    mouseDownPos.current = new THREE.Vector2(e.clientX, e.clientY)
+    mouseDownPos.current = new THREE.Vector2(e.clientX || 0, e.clientY || 0)
     hasMoved.current = false
-
-    // Disable orbit controls when clicking on object
-    // @ts-ignore
-    gl.domElement.dataset.isDragging = 'true'
 
     // Calculate offset from object center to intersection point
     const intersection = new THREE.Vector3()
@@ -59,9 +55,6 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       0,
       intersection.z - object.position.z
     )
-
-    // @ts-ignore
-    gl.domElement.style.cursor = 'grabbing'
   }
 
   const handlePointerMove = (e: any) => {
@@ -69,12 +62,19 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
     e.stopPropagation()
 
     // Check if mouse has moved significantly
-    const currentPos = new THREE.Vector2(e.clientX, e.clientY)
+    const currentPos = new THREE.Vector2(e.clientX || 0, e.clientY || 0)
     const distance = currentPos.distanceTo(mouseDownPos.current)
 
-    if (distance > 3) { // 3 pixels threshold
-      hasMoved.current = true
-      setIsDragging(true)
+    if (distance > 5) { // 5 pixels threshold
+      if (!hasMoved.current) {
+        hasMoved.current = true
+        setIsDragging(true)
+        // Disable orbit controls when dragging starts
+        // @ts-ignore
+        gl.domElement.dataset.isDragging = 'true'
+        // @ts-ignore
+        gl.domElement.style.cursor = 'grabbing'
+      }
 
       const intersection = new THREE.Vector3()
       raycaster.ray.intersectPlane(dragPlane.current, intersection)
@@ -95,7 +95,7 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
   const handlePointerUp = (e: any) => {
     e.stopPropagation()
 
-    // If didn't move, treat as click
+    // If didn't move, treat as click for selection
     if (!hasMoved.current && mouseDownPos.current) {
       selectObject(object.id, e.shiftKey)
     }

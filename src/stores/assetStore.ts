@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { Asset, StylePreset, GeometryType } from '../types'
+import { useSceneStore } from './sceneStore'
 
 interface AssetState {
   assets: Asset[]
@@ -411,5 +412,8 @@ export const useAssetStore = create<AssetState>((set, get) => ({
 
     // Reapply filters
     get().filterByCategory(get().selectedCategory)
+
+    // Update scene objects with new style
+    useSceneStore.getState().applyStyleToObjects(style)
   }
 }))
