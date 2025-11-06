@@ -31,10 +31,12 @@ export default function AssetLibrary() {
       visible: true,
       geometryType: asset.geometryType,
       geometryParams: asset.geometryParams,
+      displayText: asset.displayText || asset.name,
+      thumbnail: asset.thumbnail,
       materialProps: {
-        color: '#3b82f6',
-        metalness: 0.5,
-        roughness: 0.5,
+        color: asset.color || '#3b82f6',
+        metalness: 0.3,
+        roughness: 0.7,
         emissive: '#000000',
         emissiveIntensity: 0
       }

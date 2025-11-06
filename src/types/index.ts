@@ -12,6 +12,8 @@ export interface SceneObject {
   visible: boolean
   geometryType?: 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus' | 'custom'
   geometryParams?: Record<string, any>
+  displayText?: string
+  thumbnail?: string
 }
 
 export interface MaterialProperties {
@@ -33,6 +35,8 @@ export interface Asset {
   geometryParams?: Record<string, any>
   aiGenerated?: boolean
   aiPrompt?: string
+  color?: string
+  displayText?: string
 }
 
 export interface SceneSettings {

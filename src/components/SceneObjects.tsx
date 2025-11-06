@@ -1,6 +1,7 @@
 import { useSceneStore } from '../stores/sceneStore'
 import type { SceneObject } from '../types'
 import * as THREE from 'three'
+import { Text } from '@react-three/drei'
 
 function SceneObjectMesh({ object }: { object: SceneObject }) {
   const { selectObject, selectedObjectIds } = useSceneStore()
@@ -24,24 +25,54 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
   )
 
   return (
-    <mesh
+    <group
       position={[object.position.x, object.position.y, object.position.z]}
       rotation={[object.rotation.x, object.rotation.y, object.rotation.z]}
       scale={[object.scale.x, object.scale.y, object.scale.z]}
-      onClick={handleClick}
-      visible={object.visible}
-      castShadow
-      receiveShadow
     >
-      {renderGeometry(object)}
-      {material}
-      {isSelected && (
-        <lineSegments>
-          <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
-          <lineBasicMaterial color="#fbbf24" linewidth={2} />
-        </lineSegments>
+      <mesh
+        onClick={handleClick}
+        visible={object.visible}
+        castShadow
+        receiveShadow
+      >
+        {renderGeometry(object)}
+        {material}
+        {isSelected && (
+          <lineSegments>
+            <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
+            <lineBasicMaterial color="#fbbf24" linewidth={2} />
+          </lineSegments>
+        )}
+      </mesh>
+
+      {/* Text Label */}
+      {object.displayText && (
+        <Text
+          position={[0, -1.2, 0]}
+          fontSize={0.3}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={0.02}
+          outlineColor="#000000"
+        >
+          {object.displayText}
+        </Text>
       )}
-    </mesh>
+
+      {/* Emoji Icon */}
+      {object.thumbnail && (
+        <Text
+          position={[0, 0, 0.6]}
+          fontSize={0.5}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {object.thumbnail}
+        </Text>
+      )}
+    </group>
   )
 }
 
