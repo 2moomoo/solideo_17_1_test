@@ -1,17 +1,22 @@
 import { create } from 'zustand'
-import type { Asset } from '../types'
+import type { Asset, StylePreset, GeometryType } from '../types'
 
 interface AssetState {
   assets: Asset[]
   filteredAssets: Asset[]
   selectedCategory: string | null
   searchQuery: string
+  stylePresets: StylePreset[]
+  currentStyleId: string
 
   // Actions
   setAssets: (assets: Asset[]) => void
   filterByCategory: (category: string | null) => void
   searchAssets: (query: string) => void
   addAsset: (asset: Asset) => void
+  addStylePreset: (preset: StylePreset) => void
+  setCurrentStyle: (styleId: string) => void
+  applyStyleToAssets: (styleId: string) => void
 }
 
 // Tech Stack Assets
@@ -289,11 +294,46 @@ const techStackAssets: Asset[] = [
   }
 ]
 
+// Style Presets
+const defaultStylePresets: StylePreset[] = [
+  {
+    id: 'default',
+    name: 'Default Style',
+    description: 'Original tech stack categorization',
+    categoryMappings: {
+      Language: 'cylinder',
+      Framework: 'box',
+      Database: 'torus',
+      Tools: 'sphere'
+    }
+  }
+]
+
+// Helper function to get geometry params based on type
+function getGeometryParams(geometryType: GeometryType): Record<string, any> {
+  switch (geometryType) {
+    case 'sphere':
+      return { radius: 0.6, widthSegments: 32, heightSegments: 32 }
+    case 'cylinder':
+      return { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 }
+    case 'box':
+      return { width: 1, height: 1, depth: 1 }
+    case 'cone':
+      return { radius: 0.6, height: 1, radialSegments: 32 }
+    case 'torus':
+      return { radius: 0.5, tube: 0.2, radialSegments: 16, tubularSegments: 100 }
+    default:
+      return { width: 1, height: 1, depth: 1 }
+  }
+}
+
 export const useAssetStore = create<AssetState>((set, get) => ({
   assets: techStackAssets,
   filteredAssets: techStackAssets,
   selectedCategory: null,
   searchQuery: '',
+  stylePresets: defaultStylePresets,
+  currentStyleId: 'default',
 
   setAssets: (assets) => set({ assets, filteredAssets: assets }),
 
@@ -336,5 +376,40 @@ export const useAssetStore = create<AssetState>((set, get) => ({
   addAsset: (asset) => set((state) => ({
     assets: [...state.assets, asset],
     filteredAssets: [...state.filteredAssets, asset]
-  }))
+  })),
+
+  addStylePreset: (preset) => set((state) => ({
+    stylePresets: [...state.stylePresets, preset]
+  })),
+
+  setCurrentStyle: (styleId) => {
+    set({ currentStyleId: styleId })
+    get().applyStyleToAssets(styleId)
+  },
+
+  applyStyleToAssets: (styleId) => {
+    const { stylePresets, assets } = get()
+    const style = stylePresets.find(s => s.id === styleId)
+
+    if (!style) return
+
+    // Update assets with new geometry based on style
+    const updatedAssets = assets.map(asset => {
+      const category = asset.category as keyof typeof style.categoryMappings
+      if (category in style.categoryMappings) {
+        const newGeometryType = style.categoryMappings[category]
+        return {
+          ...asset,
+          geometryType: newGeometryType,
+          geometryParams: getGeometryParams(newGeometryType)
+        }
+      }
+      return asset
+    })
+
+    set({ assets: updatedAssets })
+
+    // Reapply filters
+    get().filterByCategory(get().selectedCategory)
+  }
 }))

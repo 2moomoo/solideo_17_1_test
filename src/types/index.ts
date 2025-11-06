@@ -46,6 +46,8 @@ export interface SceneSettings {
   directionalLightIntensity: number
   directionalLightPosition: { x: number; y: number; z: number }
   layoutSpacing: number
+  showText: boolean
+  showEmoji: boolean
 }
 
 export interface RenderSettings {
@@ -65,6 +67,22 @@ export interface AIFeedback {
   generatedAssets: Asset[]
   context?: string
 }
+
+export interface StylePreset {
+  id: string
+  name: string
+  description: string
+  categoryMappings: {
+    Language: GeometryType
+    Framework: GeometryType
+    Database: GeometryType
+    Tools: GeometryType
+  }
+  aiGenerated?: boolean
+  aiPrompt?: string
+}
+
+export type GeometryType = 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus'
 
 export type TransformMode = 'translate' | 'rotate' | 'scale'
 

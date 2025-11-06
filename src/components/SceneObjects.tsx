@@ -6,12 +6,14 @@ import * as THREE from 'three'
 import { Text } from '@react-three/drei'
 
 function SceneObjectMesh({ object }: { object: SceneObject }) {
-  const { selectObject, selectedObjectIds, updateObject, objects } = useSceneStore()
+  const { selectObject, selectedObjectIds, updateObject, objects, sceneSettings } = useSceneStore()
   const isSelected = selectedObjectIds.includes(object.id)
   const [isDragging, setIsDragging] = useState(false)
   const { camera, raycaster, pointer, gl } = useThree()
   const dragPlane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.5))
   const dragOffset = useRef(new THREE.Vector3())
+  const mouseDownPos = useRef<THREE.Vector2 | null>(null)
+  const hasMoved = useRef(false)
 
   const checkCollision = (newPos: { x: number; y: number; z: number }): { x: number; y: number; z: number } => {
     const collisionRadius = 1.0
@@ -40,15 +42,14 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
 
   const handlePointerDown = (e: any) => {
     e.stopPropagation()
-    setIsDragging(true)
-    selectObject(object.id, e.shiftKey)
 
-    // Disable orbit controls during drag
-    const controls = gl.domElement.parentElement?.querySelector('canvas')
-    if (controls) {
-      // @ts-ignore
-      gl.domElement.dataset.isDragging = 'true'
-    }
+    // Store mouse down position
+    mouseDownPos.current = new THREE.Vector2(e.clientX, e.clientY)
+    hasMoved.current = false
+
+    // Disable orbit controls when clicking on object
+    // @ts-ignore
+    gl.domElement.dataset.isDragging = 'true'
 
     // Calculate offset from object center to intersection point
     const intersection = new THREE.Vector3()
@@ -64,40 +65,51 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
   }
 
   const handlePointerMove = (e: any) => {
-    if (!isDragging) return
+    if (!mouseDownPos.current) return
     e.stopPropagation()
 
-    const intersection = new THREE.Vector3()
-    raycaster.ray.intersectPlane(dragPlane.current, intersection)
+    // Check if mouse has moved significantly
+    const currentPos = new THREE.Vector2(e.clientX, e.clientY)
+    const distance = currentPos.distanceTo(mouseDownPos.current)
 
-    const newPos = {
-      x: intersection.x - dragOffset.current.x,
-      y: object.position.y,
-      z: intersection.z - dragOffset.current.z
+    if (distance > 3) { // 3 pixels threshold
+      hasMoved.current = true
+      setIsDragging(true)
+
+      const intersection = new THREE.Vector3()
+      raycaster.ray.intersectPlane(dragPlane.current, intersection)
+
+      const newPos = {
+        x: intersection.x - dragOffset.current.x,
+        y: object.position.y,
+        z: intersection.z - dragOffset.current.z
+      }
+
+      // Check collision and adjust position
+      const finalPos = checkCollision(newPos)
+
+      updateObject(object.id, { position: finalPos })
     }
-
-    // Check collision and adjust position
-    const finalPos = checkCollision(newPos)
-
-    updateObject(object.id, { position: finalPos })
   }
 
   const handlePointerUp = (e: any) => {
     e.stopPropagation()
-    setIsDragging(false)
 
-    // Re-enable orbit controls after drag
+    // If didn't move, treat as click
+    if (!hasMoved.current && mouseDownPos.current) {
+      selectObject(object.id, e.shiftKey)
+    }
+
+    setIsDragging(false)
+    mouseDownPos.current = null
+    hasMoved.current = false
+
+    // Re-enable orbit controls after interaction
     // @ts-ignore
     gl.domElement.dataset.isDragging = 'false'
 
     // @ts-ignore
     gl.domElement.style.cursor = 'auto'
-  }
-
-  const handleClick = (e: any) => {
-    if (isDragging) return
-    e.stopPropagation()
-    selectObject(object.id, e.shiftKey)
   }
 
   const material = object.materialProps ? (
@@ -117,7 +129,6 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       position={[object.position.x, object.position.y, object.position.z]}
       rotation={[object.rotation.x, object.rotation.y, object.rotation.z]}
       scale={[object.scale.x, object.scale.y, object.scale.z]}
-      onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -139,7 +150,7 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       </mesh>
 
       {/* Bottom Text Label */}
-      {object.displayText && (
+      {sceneSettings.showText && object.displayText && (
         <Text
           position={[0, -1.2, 0]}
           fontSize={0.3}
@@ -154,7 +165,7 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       )}
 
       {/* Top Emoji (for aerial view) */}
-      {object.thumbnail && (
+      {sceneSettings.showEmoji && object.thumbnail && (
         <Text
           position={[0, 1.2, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
@@ -167,7 +178,7 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       )}
 
       {/* Top Text Label (for aerial view, below emoji) */}
-      {object.displayText && (
+      {sceneSettings.showText && object.displayText && (
         <Text
           position={[0, 0.8, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
@@ -183,7 +194,7 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       )}
 
       {/* Front Emoji Icon */}
-      {object.thumbnail && (
+      {sceneSettings.showEmoji && object.thumbnail && (
         <Text
           position={[0, 0, 0.6]}
           fontSize={0.5}

@@ -1,7 +1,9 @@
 import { useSceneStore } from '../stores/sceneStore'
+import { useAssetStore } from '../stores/assetStore'
 
 export default function SceneSettingsPanel() {
   const { sceneSettings, updateSceneSettings } = useSceneStore()
+  const { stylePresets, currentStyleId, setCurrentStyle } = useAssetStore()
 
   return (
     <div className="p-4 space-y-6">
@@ -155,6 +157,62 @@ export default function SceneSettingsPanel() {
             <p className="text-xs text-gray-500 mt-1">
               Adjust spacing between objects in auto layout
             </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Style Selection */}
+      <div className="border-t border-gray-700 pt-4">
+        <h4 className="text-gray-300 font-medium mb-3 text-sm">Style</h4>
+
+        <div className="space-y-2">
+          <label className="text-xs text-gray-400 mb-1 block">
+            Geometry Style
+          </label>
+          <select
+            value={currentStyleId}
+            onChange={(e) => setCurrentStyle(e.target.value)}
+            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            {stylePresets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.name} {preset.aiGenerated ? '✨' : ''}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            {stylePresets.find(s => s.id === currentStyleId)?.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Display Settings */}
+      <div className="border-t border-gray-700 pt-4">
+        <h4 className="text-gray-300 font-medium mb-3 text-sm">Display</h4>
+
+        <div className="space-y-3">
+          <div>
+            <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={sceneSettings.showText}
+                onChange={(e) => updateSceneSettings({ showText: e.target.checked })}
+                className="w-4 h-4"
+              />
+              Show Text Labels
+            </label>
+          </div>
+
+          <div>
+            <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={sceneSettings.showEmoji}
+                onChange={(e) => updateSceneSettings({ showEmoji: e.target.checked })}
+                className="w-4 h-4"
+              />
+              Show Emoji Icons
+            </label>
           </div>
         </div>
       </div>
