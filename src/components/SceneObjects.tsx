@@ -46,18 +46,43 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
 }
 
 function renderGeometry(object: SceneObject) {
-  // This would normally come from asset data, but for now we'll use basic shapes
-  switch (object.name) {
-    case 'Sphere':
-      return <sphereGeometry args={[1, 32, 32]} />
-    case 'Cylinder':
-      return <cylinderGeometry args={[1, 1, 2, 32]} />
-    case 'Cone':
-      return <coneGeometry args={[1, 2, 32]} />
-    case 'Torus':
-      return <torusGeometry args={[1, 0.4, 16, 100]} />
+  const geometryType = object.geometryType || 'box'
+  const params = object.geometryParams || {}
+
+  switch (geometryType) {
+    case 'sphere':
+      return <sphereGeometry args={[
+        params.radius || 1,
+        params.widthSegments || 32,
+        params.heightSegments || 32
+      ]} />
+    case 'cylinder':
+      return <cylinderGeometry args={[
+        params.radiusTop || 1,
+        params.radiusBottom || 1,
+        params.height || 2,
+        params.radialSegments || 32
+      ]} />
+    case 'cone':
+      return <coneGeometry args={[
+        params.radius || 1,
+        params.height || 2,
+        params.radialSegments || 32
+      ]} />
+    case 'torus':
+      return <torusGeometry args={[
+        params.radius || 1,
+        params.tube || 0.4,
+        params.radialSegments || 16,
+        params.tubularSegments || 100
+      ]} />
+    case 'box':
     default:
-      return <boxGeometry args={[1, 1, 1]} />
+      return <boxGeometry args={[
+        params.width || 1,
+        params.height || 1,
+        params.depth || 1
+      ]} />
   }
 }
 

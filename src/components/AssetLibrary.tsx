@@ -9,7 +9,7 @@ export default function AssetLibrary() {
   const { addObject } = useSceneStore()
   const [searchValue, setSearchValue] = useState('')
 
-  const categories = ['All', 'Primitives', 'AI Generated']
+  const categories = ['All', 'Frontend', 'Backend', 'Database', 'DevOps', 'Mobile', 'AI Generated']
 
   const handleSearch = (value: string) => {
     setSearchValue(value)
@@ -29,6 +29,8 @@ export default function AssetLibrary() {
       rotation: { x: 0, y: 0, z: 0 },
       scale: { x: 1, y: 1, z: 1 },
       visible: true,
+      geometryType: asset.geometryType,
+      geometryParams: asset.geometryParams,
       materialProps: {
         color: '#3b82f6',
         metalness: 0.5,

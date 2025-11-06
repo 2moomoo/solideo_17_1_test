@@ -10,6 +10,8 @@ export interface SceneObject {
   scale: { x: number; y: number; z: number }
   materialProps?: MaterialProperties
   visible: boolean
+  geometryType?: 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus' | 'custom'
+  geometryParams?: Record<string, any>
 }
 
 export interface MaterialProperties {
