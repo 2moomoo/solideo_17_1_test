@@ -3,6 +3,7 @@ import { OrbitControls, Grid, PerspectiveCamera } from '@react-three/drei'
 import { useSceneStore } from '../stores/sceneStore'
 import SceneObjects from './SceneObjects'
 import TransformControls from './TransformControls'
+import CameraController from './CameraController'
 
 export default function Viewport3D() {
   const { sceneSettings } = useSceneStore()
@@ -60,6 +61,9 @@ export default function Viewport3D() {
           minDistance={2}
           maxDistance={50}
         />
+
+        {/* Camera View Controller */}
+        <CameraController />
       </Canvas>
     </div>
   )

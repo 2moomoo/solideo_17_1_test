@@ -16,6 +16,7 @@ interface SceneState {
   setTransformMode: (mode: TransformMode) => void
   updateSceneSettings: (settings: Partial<SceneSettings>) => void
   duplicateObject: (id: string) => void
+  autoLayout: () => void
 }
 
 export const useSceneStore = create<SceneState>((set) => ({
@@ -83,6 +84,43 @@ export const useSceneStore = create<SceneState>((set) => ({
     return {
       objects: [...state.objects, duplicate],
       selectedObjectIds: [duplicate.id]
+    }
+  }),
+
+  autoLayout: () => set((state) => {
+    if (state.objects.length === 0) return state
+
+    // Calculate grid dimensions for compact layout
+    const objectCount = state.objects.length
+    const cols = Math.ceil(Math.sqrt(objectCount))
+    const rows = Math.ceil(objectCount / cols)
+
+    // Spacing between objects
+    const spacing = 2.5
+
+    // Center the grid
+    const offsetX = -(cols - 1) * spacing / 2
+    const offsetZ = -(rows - 1) * spacing / 2
+
+    // Layout objects in a grid
+    const layoutedObjects = state.objects.map((obj, index) => {
+      const col = index % cols
+      const row = Math.floor(index / cols)
+
+      return {
+        ...obj,
+        position: {
+          x: offsetX + col * spacing,
+          y: 0.5,
+          z: offsetZ + row * spacing
+        },
+        rotation: { x: 0, y: 0, z: 0 },
+        scale: { x: 1, y: 1, z: 1 }
+      }
+    })
+
+    return {
+      objects: layoutedObjects
     }
   })
 }))

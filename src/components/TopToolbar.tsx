@@ -7,7 +7,9 @@ import {
   Undo,
   Redo,
   Save,
-  FolderOpen
+  FolderOpen,
+  LayoutGrid,
+  Eye
 } from 'lucide-react'
 import { useSceneStore } from '../stores/sceneStore'
 
@@ -17,7 +19,9 @@ export default function TopToolbar() {
     setTransformMode,
     selectedObjectIds,
     duplicateObject,
-    removeObject
+    removeObject,
+    autoLayout,
+    objects
   } = useSceneStore()
 
   const selectedId = selectedObjectIds[0]
@@ -76,6 +80,19 @@ export default function TopToolbar() {
           <Maximize2 size={18} />
         </button>
       </div>
+
+      <div className="w-px h-6 bg-gray-700 mx-2" />
+
+      {/* Auto Layout */}
+      <button
+        className="toolbar-btn bg-purple-600 hover:bg-purple-700"
+        disabled={objects.length === 0}
+        onClick={autoLayout}
+        title="Automatically arrange all objects in a grid"
+      >
+        <LayoutGrid size={18} />
+        <span>Auto Layout</span>
+      </button>
 
       <div className="w-px h-6 bg-gray-700 mx-2" />
 

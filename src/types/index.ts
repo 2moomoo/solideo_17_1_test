@@ -60,3 +60,11 @@ export interface AIFeedback {
 }
 
 export type TransformMode = 'translate' | 'rotate' | 'scale'
+
+export type CameraView = 'perspective' | 'top' | 'front' | 'side'
+
+export interface CameraPreset {
+  position: [number, number, number]
+  lookAt: [number, number, number]
+  fov?: number
+}

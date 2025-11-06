@@ -1,5 +1,6 @@
-import { Download, Loader2, Camera } from 'lucide-react'
+import { Download, Loader2, Camera, Eye } from 'lucide-react'
 import { useRenderStore } from '../stores/renderStore'
+import type { CameraView } from '../types'
 
 export default function RenderPanel() {
   const {
@@ -9,7 +10,9 @@ export default function RenderPanel() {
     setRendering,
     setRenderProgress,
     lastRenderedImage,
-    setLastRenderedImage
+    setLastRenderedImage,
+    cameraView,
+    setCameraView
   } = useRenderStore()
 
   const handleRender = async () => {
@@ -57,10 +60,41 @@ export default function RenderPanel() {
     { name: '4K', width: 3840, height: 2160 }
   ]
 
+  const cameraViews: { name: string; value: CameraView; icon: string }[] = [
+    { name: '3D View', value: 'perspective', icon: '🎭' },
+    { name: 'Top View', value: 'top', icon: '⬇️' },
+    { name: 'Front View', value: 'front', icon: '👁️' },
+    { name: 'Side View', value: 'side', icon: '👉' }
+  ]
+
   return (
     <div className="p-4 space-y-6">
       <div>
         <h3 className="text-white font-medium mb-4">Render Settings</h3>
+
+        {/* Camera View Selection */}
+        <div className="mb-4">
+          <label className="text-sm text-gray-300 mb-2 block flex items-center gap-2">
+            <Eye size={16} />
+            Camera View (2D/3D)
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {cameraViews.map((view) => (
+              <button
+                key={view.value}
+                className={`px-3 py-2 rounded text-sm transition-colors flex items-center justify-center gap-2 ${
+                  cameraView === view.value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+                onClick={() => setCameraView(view.value)}
+              >
+                <span>{view.icon}</span>
+                <span>{view.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Resolution Presets */}
         <div className="mb-4">
