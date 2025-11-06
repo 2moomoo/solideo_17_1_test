@@ -28,7 +28,7 @@ export const useSceneStore = create<SceneState>((set) => ({
     ambientLightIntensity: 0.5,
     directionalLightIntensity: 1.0,
     directionalLightPosition: { x: 5, y: 10, z: 5 },
-    layoutSpacing: 1.8
+    layoutSpacing: 1.2
   },
   transformMode: 'translate',
 

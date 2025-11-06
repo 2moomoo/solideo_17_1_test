@@ -16,73 +16,11 @@ interface AssetState {
 
 // Tech Stack Assets
 const techStackAssets: Asset[] = [
-  // Frontend
-  {
-    id: 'tech-react',
-    name: 'React',
-    category: 'Frontend',
-    tags: ['javascript', 'ui', 'library', 'meta'],
-    thumbnail: '⚛️',
-    description: 'JavaScript library for building user interfaces',
-    geometryType: 'box',
-    geometryParams: { width: 1, height: 1, depth: 1 },
-    color: '#61DAFB',
-    displayText: 'React'
-  },
-  {
-    id: 'tech-vue',
-    name: 'Vue.js',
-    category: 'Frontend',
-    tags: ['javascript', 'ui', 'framework', 'progressive'],
-    thumbnail: '💚',
-    description: 'Progressive JavaScript framework',
-    geometryType: 'box',
-    geometryParams: { width: 1, height: 1, depth: 1 },
-    color: '#42B883',
-    displayText: 'Vue.js'
-  },
-  {
-    id: 'tech-angular',
-    name: 'Angular',
-    category: 'Frontend',
-    tags: ['typescript', 'ui', 'framework', 'google'],
-    thumbnail: '🅰️',
-    description: 'Platform for building web applications',
-    geometryType: 'box',
-    geometryParams: { width: 1, height: 1, depth: 1 },
-    color: '#DD0031',
-    displayText: 'Angular'
-  },
-  {
-    id: 'tech-svelte',
-    name: 'Svelte',
-    category: 'Frontend',
-    tags: ['javascript', 'ui', 'framework', 'compiler'],
-    thumbnail: '🔥',
-    description: 'Cybernetically enhanced web apps',
-    geometryType: 'box',
-    geometryParams: { width: 1, height: 1, depth: 1 },
-    color: '#FF3E00',
-    displayText: 'Svelte'
-  },
-  {
-    id: 'tech-nextjs',
-    name: 'Next.js',
-    category: 'Frontend',
-    tags: ['react', 'ssr', 'framework', 'vercel'],
-    thumbnail: '▲',
-    description: 'React framework for production',
-    geometryType: 'box',
-    geometryParams: { width: 1, height: 1, depth: 1 },
-    color: '#000000',
-    displayText: 'Next.js'
-  },
-
-  // Backend
+  // Language (언어) - Cylinder
   {
     id: 'tech-nodejs',
     name: 'Node.js',
-    category: 'Backend',
+    category: 'Language',
     tags: ['javascript', 'runtime', 'server'],
     thumbnail: '🟢',
     description: 'JavaScript runtime built on Chrome V8',
@@ -94,7 +32,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-python',
     name: 'Python',
-    category: 'Backend',
+    category: 'Language',
     tags: ['language', 'ai', 'data'],
     thumbnail: '🐍',
     description: 'High-level programming language',
@@ -106,7 +44,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-java',
     name: 'Java',
-    category: 'Backend',
+    category: 'Language',
     tags: ['language', 'enterprise', 'jvm'],
     thumbnail: '☕',
     description: 'Object-oriented programming language',
@@ -118,7 +56,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-golang',
     name: 'Go',
-    category: 'Backend',
+    category: 'Language',
     tags: ['language', 'google', 'concurrent'],
     thumbnail: '🔷',
     description: 'Statically typed compiled language',
@@ -130,7 +68,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-rust',
     name: 'Rust',
-    category: 'Backend',
+    category: 'Language',
     tags: ['language', 'performance', 'memory-safe'],
     thumbnail: '🦀',
     description: 'Fast and memory-efficient language',
@@ -139,8 +77,118 @@ const techStackAssets: Asset[] = [
     color: '#CE422B',
     displayText: 'Rust'
   },
+  {
+    id: 'tech-swift',
+    name: 'Swift',
+    category: 'Language',
+    tags: ['ios', 'apple', 'language'],
+    thumbnail: '🍎',
+    description: 'Powerful language for iOS development',
+    geometryType: 'cylinder',
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
+    color: '#FA7343',
+    displayText: 'Swift'
+  },
+  {
+    id: 'tech-kotlin',
+    name: 'Kotlin',
+    category: 'Language',
+    tags: ['android', 'jvm', 'language'],
+    thumbnail: '🤖',
+    description: 'Modern language for Android development',
+    geometryType: 'cylinder',
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
+    color: '#7F52FF',
+    displayText: 'Kotlin'
+  },
 
-  // Database
+  // Framework (프레임워크) - Box
+  {
+    id: 'tech-react',
+    name: 'React',
+    category: 'Framework',
+    tags: ['javascript', 'ui', 'library', 'meta'],
+    thumbnail: '⚛️',
+    description: 'JavaScript library for building user interfaces',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#61DAFB',
+    displayText: 'React'
+  },
+  {
+    id: 'tech-vue',
+    name: 'Vue.js',
+    category: 'Framework',
+    tags: ['javascript', 'ui', 'framework', 'progressive'],
+    thumbnail: '💚',
+    description: 'Progressive JavaScript framework',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#42B883',
+    displayText: 'Vue.js'
+  },
+  {
+    id: 'tech-angular',
+    name: 'Angular',
+    category: 'Framework',
+    tags: ['typescript', 'ui', 'framework', 'google'],
+    thumbnail: '🅰️',
+    description: 'Platform for building web applications',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#DD0031',
+    displayText: 'Angular'
+  },
+  {
+    id: 'tech-svelte',
+    name: 'Svelte',
+    category: 'Framework',
+    tags: ['javascript', 'ui', 'framework', 'compiler'],
+    thumbnail: '🔥',
+    description: 'Cybernetically enhanced web apps',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#FF3E00',
+    displayText: 'Svelte'
+  },
+  {
+    id: 'tech-nextjs',
+    name: 'Next.js',
+    category: 'Framework',
+    tags: ['react', 'ssr', 'framework', 'vercel'],
+    thumbnail: '▲',
+    description: 'React framework for production',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#000000',
+    displayText: 'Next.js'
+  },
+  {
+    id: 'tech-react-native',
+    name: 'React Native',
+    category: 'Framework',
+    tags: ['react', 'ios', 'android', 'cross-platform'],
+    thumbnail: '📱',
+    description: 'Build native mobile apps using React',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#61DAFB',
+    displayText: 'RN'
+  },
+  {
+    id: 'tech-flutter',
+    name: 'Flutter',
+    category: 'Framework',
+    tags: ['dart', 'google', 'cross-platform'],
+    thumbnail: '🦋',
+    description: 'UI toolkit for mobile, web, and desktop',
+    geometryType: 'box',
+    geometryParams: { width: 1, height: 1, depth: 1 },
+    color: '#02569B',
+    displayText: 'Flutter'
+  },
+
+  // Database (데이터베이스) - Torus
   {
     id: 'tech-mongodb',
     name: 'MongoDB',
@@ -190,11 +238,11 @@ const techStackAssets: Asset[] = [
     displayText: 'Redis'
   },
 
-  // DevOps
+  // Tools (도구) - Sphere
   {
     id: 'tech-docker',
     name: 'Docker',
-    category: 'DevOps',
+    category: 'Tools',
     tags: ['container', 'deployment', 'virtualization'],
     thumbnail: '🐳',
     description: 'Platform for containerized applications',
@@ -206,7 +254,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-kubernetes',
     name: 'Kubernetes',
-    category: 'DevOps',
+    category: 'Tools',
     tags: ['orchestration', 'container', 'k8s'],
     thumbnail: '☸️',
     description: 'Container orchestration platform',
@@ -218,7 +266,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-aws',
     name: 'AWS',
-    category: 'DevOps',
+    category: 'Tools',
     tags: ['cloud', 'amazon', 'infrastructure'],
     thumbnail: '☁️',
     description: 'Amazon Web Services cloud platform',
@@ -230,7 +278,7 @@ const techStackAssets: Asset[] = [
   {
     id: 'tech-github',
     name: 'GitHub',
-    category: 'DevOps',
+    category: 'Tools',
     tags: ['git', 'version-control', 'collaboration'],
     thumbnail: '🐙',
     description: 'Code hosting and collaboration platform',
@@ -238,56 +286,6 @@ const techStackAssets: Asset[] = [
     geometryParams: { radius: 0.6, widthSegments: 32, heightSegments: 32 },
     color: '#181717',
     displayText: 'GitHub'
-  },
-
-  // Mobile
-  {
-    id: 'tech-react-native',
-    name: 'React Native',
-    category: 'Mobile',
-    tags: ['react', 'ios', 'android', 'cross-platform'],
-    thumbnail: '📱',
-    description: 'Build native mobile apps using React',
-    geometryType: 'cone',
-    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
-    color: '#61DAFB',
-    displayText: 'RN'
-  },
-  {
-    id: 'tech-flutter',
-    name: 'Flutter',
-    category: 'Mobile',
-    tags: ['dart', 'google', 'cross-platform'],
-    thumbnail: '🦋',
-    description: 'UI toolkit for mobile, web, and desktop',
-    geometryType: 'cone',
-    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
-    color: '#02569B',
-    displayText: 'Flutter'
-  },
-  {
-    id: 'tech-swift',
-    name: 'Swift',
-    category: 'Mobile',
-    tags: ['ios', 'apple', 'language'],
-    thumbnail: '🍎',
-    description: 'Powerful language for iOS development',
-    geometryType: 'cone',
-    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
-    color: '#FA7343',
-    displayText: 'Swift'
-  },
-  {
-    id: 'tech-kotlin',
-    name: 'Kotlin',
-    category: 'Mobile',
-    tags: ['android', 'jvm', 'language'],
-    thumbnail: '🤖',
-    description: 'Modern language for Android development',
-    geometryType: 'cone',
-    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
-    color: '#7F52FF',
-    displayText: 'Kotlin'
   }
 ]
 

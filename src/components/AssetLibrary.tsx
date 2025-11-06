@@ -9,7 +9,7 @@ export default function AssetLibrary() {
   const { addObject } = useSceneStore()
   const [searchValue, setSearchValue] = useState('')
 
-  const categories = ['All', 'Frontend', 'Backend', 'Database', 'DevOps', 'Mobile', 'AI Generated']
+  const categories = ['All', 'Language', 'Framework', 'Database', 'Tools', 'AI Generated']
 
   const handleSearch = (value: string) => {
     setSearchValue(value)

@@ -126,22 +126,6 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
         )}
       </mesh>
 
-      {/* Top Text Label (for aerial view) */}
-      {object.displayText && (
-        <Text
-          position={[0, 1.2, 0]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.3}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.02}
-          outlineColor="#000000"
-        >
-          {object.displayText}
-        </Text>
-      )}
-
       {/* Bottom Text Label */}
       {object.displayText && (
         <Text
@@ -160,9 +144,9 @@ function SceneObjectMesh({ object }: { object: SceneObject }) {
       {/* Top Emoji (for aerial view) */}
       {object.thumbnail && (
         <Text
-          position={[0, 1.5, 0]}
+          position={[0, 1.2, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.5}
+          fontSize={0.6}
           anchorX="center"
           anchorY="middle"
         >
