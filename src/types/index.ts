@@ -45,6 +45,7 @@ export interface SceneSettings {
   ambientLightIntensity: number
   directionalLightIntensity: number
   directionalLightPosition: { x: number; y: number; z: number }
+  layoutSpacing: number
 }
 
 export interface RenderSettings {

@@ -27,7 +27,8 @@ export const useSceneStore = create<SceneState>((set) => ({
     showGrid: true,
     ambientLightIntensity: 0.5,
     directionalLightIntensity: 1.0,
-    directionalLightPosition: { x: 5, y: 10, z: 5 }
+    directionalLightPosition: { x: 5, y: 10, z: 5 },
+    layoutSpacing: 1.8
   },
   transformMode: 'translate',
 
@@ -95,8 +96,8 @@ export const useSceneStore = create<SceneState>((set) => ({
     const cols = Math.ceil(Math.sqrt(objectCount))
     const rows = Math.ceil(objectCount / cols)
 
-    // Spacing between objects
-    const spacing = 2.5
+    // Use spacing from settings
+    const spacing = state.sceneSettings.layoutSpacing
 
     // Center the grid
     const offsetX = -(cols - 1) * spacing / 2

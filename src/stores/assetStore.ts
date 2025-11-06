@@ -87,7 +87,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🟢',
     description: 'JavaScript runtime built on Chrome V8',
     geometryType: 'cylinder',
-    geometryParams: { radiusTop: 1, radiusBottom: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
     color: '#339933',
     displayText: 'Node.js'
   },
@@ -99,7 +99,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🐍',
     description: 'High-level programming language',
     geometryType: 'cylinder',
-    geometryParams: { radiusTop: 1, radiusBottom: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
     color: '#3776AB',
     displayText: 'Python'
   },
@@ -111,7 +111,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '☕',
     description: 'Object-oriented programming language',
     geometryType: 'cylinder',
-    geometryParams: { radiusTop: 1, radiusBottom: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
     color: '#007396',
     displayText: 'Java'
   },
@@ -123,7 +123,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🔷',
     description: 'Statically typed compiled language',
     geometryType: 'cylinder',
-    geometryParams: { radiusTop: 1, radiusBottom: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
     color: '#00ADD8',
     displayText: 'Go'
   },
@@ -135,7 +135,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🦀',
     description: 'Fast and memory-efficient language',
     geometryType: 'cylinder',
-    geometryParams: { radiusTop: 1, radiusBottom: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radiusTop: 0.5, radiusBottom: 0.5, height: 1, radialSegments: 32 },
     color: '#CE422B',
     displayText: 'Rust'
   },
@@ -149,7 +149,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🍃',
     description: 'Document-oriented NoSQL database',
     geometryType: 'torus',
-    geometryParams: { radius: 0.8, tube: 0.3, radialSegments: 16, tubularSegments: 100 },
+    geometryParams: { radius: 0.5, tube: 0.2, radialSegments: 16, tubularSegments: 100 },
     color: '#47A248',
     displayText: 'MongoDB'
   },
@@ -161,7 +161,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🐘',
     description: 'Advanced open-source relational database',
     geometryType: 'torus',
-    geometryParams: { radius: 0.8, tube: 0.3, radialSegments: 16, tubularSegments: 100 },
+    geometryParams: { radius: 0.5, tube: 0.2, radialSegments: 16, tubularSegments: 100 },
     color: '#336791',
     displayText: 'PostgreSQL'
   },
@@ -173,7 +173,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🐬',
     description: 'Popular open-source relational database',
     geometryType: 'torus',
-    geometryParams: { radius: 0.8, tube: 0.3, radialSegments: 16, tubularSegments: 100 },
+    geometryParams: { radius: 0.5, tube: 0.2, radialSegments: 16, tubularSegments: 100 },
     color: '#4479A1',
     displayText: 'MySQL'
   },
@@ -185,7 +185,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🔴',
     description: 'In-memory data structure store',
     geometryType: 'torus',
-    geometryParams: { radius: 0.8, tube: 0.3, radialSegments: 16, tubularSegments: 100 },
+    geometryParams: { radius: 0.5, tube: 0.2, radialSegments: 16, tubularSegments: 100 },
     color: '#DC382D',
     displayText: 'Redis'
   },
@@ -199,7 +199,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🐳',
     description: 'Platform for containerized applications',
     geometryType: 'sphere',
-    geometryParams: { radius: 1, widthSegments: 32, heightSegments: 32 },
+    geometryParams: { radius: 0.6, widthSegments: 32, heightSegments: 32 },
     color: '#2496ED',
     displayText: 'Docker'
   },
@@ -211,7 +211,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '☸️',
     description: 'Container orchestration platform',
     geometryType: 'sphere',
-    geometryParams: { radius: 1, widthSegments: 32, heightSegments: 32 },
+    geometryParams: { radius: 0.6, widthSegments: 32, heightSegments: 32 },
     color: '#326CE5',
     displayText: 'K8s'
   },
@@ -223,7 +223,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '☁️',
     description: 'Amazon Web Services cloud platform',
     geometryType: 'sphere',
-    geometryParams: { radius: 1, widthSegments: 32, heightSegments: 32 },
+    geometryParams: { radius: 0.6, widthSegments: 32, heightSegments: 32 },
     color: '#FF9900',
     displayText: 'AWS'
   },
@@ -235,7 +235,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🐙',
     description: 'Code hosting and collaboration platform',
     geometryType: 'sphere',
-    geometryParams: { radius: 1, widthSegments: 32, heightSegments: 32 },
+    geometryParams: { radius: 0.6, widthSegments: 32, heightSegments: 32 },
     color: '#181717',
     displayText: 'GitHub'
   },
@@ -249,7 +249,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '📱',
     description: 'Build native mobile apps using React',
     geometryType: 'cone',
-    geometryParams: { radius: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
     color: '#61DAFB',
     displayText: 'RN'
   },
@@ -261,7 +261,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🦋',
     description: 'UI toolkit for mobile, web, and desktop',
     geometryType: 'cone',
-    geometryParams: { radius: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
     color: '#02569B',
     displayText: 'Flutter'
   },
@@ -273,7 +273,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🍎',
     description: 'Powerful language for iOS development',
     geometryType: 'cone',
-    geometryParams: { radius: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
     color: '#FA7343',
     displayText: 'Swift'
   },
@@ -285,7 +285,7 @@ const techStackAssets: Asset[] = [
     thumbnail: '🤖',
     description: 'Modern language for Android development',
     geometryType: 'cone',
-    geometryParams: { radius: 1, height: 1.5, radialSegments: 32 },
+    geometryParams: { radius: 0.6, height: 1, radialSegments: 32 },
     color: '#7F52FF',
     displayText: 'Kotlin'
   }

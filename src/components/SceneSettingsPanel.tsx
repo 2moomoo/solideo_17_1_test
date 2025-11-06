@@ -131,6 +131,33 @@ export default function SceneSettingsPanel() {
           </div>
         </div>
       </div>
+
+      {/* Layout Settings */}
+      <div className="border-t border-gray-700 pt-4">
+        <h4 className="text-gray-300 font-medium mb-3 text-sm">Layout</h4>
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs text-gray-400 mb-1 block">
+              Spacing: {sceneSettings.layoutSpacing.toFixed(1)}
+            </label>
+            <input
+              type="range"
+              min="1.0"
+              max="4.0"
+              step="0.1"
+              value={sceneSettings.layoutSpacing}
+              onChange={(e) =>
+                updateSceneSettings({ layoutSpacing: parseFloat(e.target.value) })
+              }
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Adjust spacing between objects in auto layout
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
