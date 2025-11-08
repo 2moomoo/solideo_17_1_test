@@ -1,5 +1,31 @@
 import * as THREE from 'three'
+import { Node, Edge } from 'reactflow'
 
+// 2D Diagram Types (Primary)
+export interface DiagramNodeData {
+  label: string
+  icon?: string
+  category?: string
+  description?: string
+  color?: string
+  // Custom SVG shape from AI
+  customShape?: {
+    svgPath: string
+    fill?: string
+    stroke?: string
+    strokeWidth?: number
+  }
+  // For 3D rendering
+  geometry3D?: {
+    type: 'box' | 'sphere' | 'cylinder' | 'cone' | 'torus' | 'custom'
+    params?: Record<string, any>
+  }
+}
+
+export type DiagramNode = Node<DiagramNodeData>
+export type DiagramEdge = Edge
+
+// 3D Scene Types (Secondary - for 3D viewer)
 export interface SceneObject {
   id: string
   name: string
