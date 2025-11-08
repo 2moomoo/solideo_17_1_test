@@ -23,6 +23,102 @@ export interface SVGShapeResponse {
   strokeWidth: number
 }
 
+export interface PolygonPath {
+  id: string
+  svgPath: string
+  fill: string
+  stroke: string
+  strokeWidth: number
+  opacity?: number
+}
+
+export interface TechStackIconRequest {
+  description: string // e.g., "React logo", "Node.js icon", "Database symbol"
+  width?: number
+  height?: number
+}
+
+export interface TechStackIconResponse {
+  name: string
+  description: string
+  polygons: PolygonPath[]
+  viewBox: { width: number; height: number }
+}
+
+/**
+ * Generate tech stack icon with individual editable polygons using Gemini AI
+ */
+export async function generateTechStackIcon(request: TechStackIconRequest): Promise<TechStackIconResponse> {
+  if (!genAI) {
+    return generateMockTechStackIcon(request)
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' })
+
+    const prompt = `You are a tech icon designer. Create a tech stack icon by breaking it down into individual polygon paths.
+
+Description: ${request.description}
+Canvas size: ${request.width || 200}x${request.height || 200}
+
+IMPORTANT RULES:
+1. Break down the icon into 3-8 individual polygon shapes
+2. Each polygon should be a separate, editable SVG path
+3. Use simple geometric shapes (rectangles, triangles, circles as polygons)
+4. Each polygon should have its own color and can be independently styled
+5. Paths should fit within a viewBox of 0 0 ${request.width || 200} ${request.height || 200}
+6. Return ONLY valid JSON, no explanation
+
+RESPONSE FORMAT (JSON):
+{
+  "name": "React",
+  "description": "React logo with atomic symbol",
+  "viewBox": { "width": 200, "height": 200 },
+  "polygons": [
+    {
+      "id": "polygon-1",
+      "svgPath": "M 100 80 C 120 80 140 90 140 100 C 140 110 120 120 100 120 C 80 120 60 110 60 100 C 60 90 80 80 100 80 Z",
+      "fill": "#61dafb",
+      "stroke": "#00d8ff",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "polygon-2",
+      "svgPath": "M 95 95 L 105 95 L 105 105 L 95 105 Z",
+      "fill": "#282c34",
+      "stroke": "#000000",
+      "strokeWidth": 1,
+      "opacity": 1
+    }
+  ]
+}
+
+Generate the tech stack icon now:`
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    const text = response.text()
+
+    // Try to parse JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0])
+      return {
+        name: parsed.name || 'Tech Icon',
+        description: parsed.description || request.description,
+        viewBox: parsed.viewBox || { width: request.width || 200, height: request.height || 200 },
+        polygons: parsed.polygons || []
+      }
+    }
+
+    throw new Error('Failed to parse AI response')
+  } catch (error) {
+    console.error('Gemini API error:', error)
+    return generateMockTechStackIcon(request)
+  }
+}
+
 /**
  * Generate SVG path using Gemini AI
  */
@@ -227,6 +323,47 @@ function generateMockDiagram(_prompt: string): {
         source: '2',
         target: '3',
         label: 'queries'
+      }
+    ]
+  }
+}
+
+/**
+ * Mock tech stack icon generator (fallback)
+ */
+function generateMockTechStackIcon(request: TechStackIconRequest): TechStackIconResponse {
+  const width = request.width || 200
+  const height = request.height || 200
+
+  // Simple React-like icon with 3 editable polygons
+  return {
+    name: 'Mock Icon',
+    description: request.description,
+    viewBox: { width, height },
+    polygons: [
+      {
+        id: 'polygon-1',
+        svgPath: `M ${width/2} ${height*0.3} C ${width*0.7} ${height*0.3} ${width*0.85} ${height*0.4} ${width*0.85} ${height*0.5} C ${width*0.85} ${height*0.6} ${width*0.7} ${height*0.7} ${width/2} ${height*0.7} C ${width*0.3} ${height*0.7} ${width*0.15} ${height*0.6} ${width*0.15} ${height*0.5} C ${width*0.15} ${height*0.4} ${width*0.3} ${height*0.3} ${width/2} ${height*0.3} Z`,
+        fill: '#61dafb',
+        stroke: '#00d8ff',
+        strokeWidth: 2,
+        opacity: 0.8
+      },
+      {
+        id: 'polygon-2',
+        svgPath: `M ${width*0.35} ${height*0.35} L ${width*0.65} ${height*0.35} L ${width*0.65} ${height*0.65} L ${width*0.35} ${height*0.65} Z`,
+        fill: '#282c34',
+        stroke: '#1a1e26',
+        strokeWidth: 1,
+        opacity: 1
+      },
+      {
+        id: 'polygon-3',
+        svgPath: `M ${width/2} ${height*0.4} L ${width*0.6} ${height*0.5} L ${width/2} ${height*0.6} L ${width*0.4} ${height*0.5} Z`,
+        fill: '#61dafb',
+        stroke: '#00d8ff',
+        strokeWidth: 1,
+        opacity: 1
       }
     ]
   }
