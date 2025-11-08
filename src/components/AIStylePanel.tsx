@@ -11,6 +11,7 @@ export default function AIStylePanel({ selectedStacks }: AIStylePanelProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [useDefaultStyle, setUseDefaultStyle] = useState(false)
+  const hasApiKey = Boolean(import.meta.env.VITE_GEMINI_API_KEY)
 
   const setLayout = useLayoutStore(state => state.setLayout)
 
@@ -55,6 +56,12 @@ export default function AIStylePanel({ selectedStacks }: AIStylePanelProps) {
   return (
     <div className="p-4 border-t border-gray-200 bg-white">
       <h3 className="text-sm font-bold text-gray-800 mb-3">AI Design Style</h3>
+
+      {!hasApiKey && (
+        <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+          ℹ️ No API key - using mock design mode
+        </div>
+      )}
 
       <div className="mb-3">
         <label className="flex items-center gap-2 mb-2">
