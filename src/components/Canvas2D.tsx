@@ -73,8 +73,16 @@ export default function Canvas2D({ nodes: initialNodes, edges: initialEdges, onN
         nodeTypes={nodeTypes}
         fitView
         attributionPosition="bottom-left"
+        snapToGrid={true}
+        snapGrid={[20, 20]}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#888" />
+        <Background
+          variant={BackgroundVariant.Lines}
+          gap={20}
+          size={1}
+          color="#cbd5e1"
+          style={{ opacity: 0.3 }}
+        />
         <Controls />
         <MiniMap
           nodeColor={(node) => {

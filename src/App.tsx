@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { Box } from 'lucide-react'
+import { Box, Library } from 'lucide-react'
 import Canvas2D from './components/Canvas2D'
 import Viewer3DModal from './components/Viewer3DModal'
 import AIPanel2D from './components/AIPanel2D'
+import AssetLibrary2D from './components/AssetLibrary2D'
 import { useDiagramStore } from './stores/diagramStore'
 
 function App() {
   const { nodes, edges, setNodes, setEdges } = useDiagramStore()
   const [show3DViewer, setShow3DViewer] = useState(false)
+  const [leftPanel, setLeftPanel] = useState<'ai' | 'library'>('ai')
 
   return (
     <div className="w-full h-full flex flex-col bg-gray-900">
@@ -33,9 +35,38 @@ function App() {
 
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - AI Panel */}
-        <div className="w-80 bg-gray-800 border-r border-gray-700">
-          <AIPanel2D />
+        {/* Left Sidebar - AI Panel / Asset Library */}
+        <div className="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+          {/* Tabs */}
+          <div className="flex border-b border-gray-700">
+            <button
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                leftPanel === 'ai'
+                  ? 'bg-gray-700 text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              }`}
+              onClick={() => setLeftPanel('ai')}
+            >
+              <Box size={16} />
+              AI Assistant
+            </button>
+            <button
+              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                leftPanel === 'library'
+                  ? 'bg-gray-700 text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              }`}
+              onClick={() => setLeftPanel('library')}
+            >
+              <Library size={16} />
+              Library
+            </button>
+          </div>
+
+          {/* Panel Content */}
+          <div className="flex-1 overflow-hidden">
+            {leftPanel === 'ai' ? <AIPanel2D /> : <AssetLibrary2D />}
+          </div>
         </div>
 
         {/* 2D Canvas (Main) */}
