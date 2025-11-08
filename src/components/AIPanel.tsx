@@ -17,27 +17,31 @@ export default function AIPanel() {
 
   const [input, setInput] = useState('')
   const [styleInput, setStyleInput] = useState('')
+  const [assetName, setAssetName] = useState('')
   const [activeTab, setActiveTab] = useState<'assets' | 'style'>('assets')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (input.trim() && !isGenerating) {
-      await submitFeedback(input)
+      await submitFeedback(input, assetName.trim() || undefined)
       setInput('')
+      setAssetName('')
     }
   }
 
   const handleStyleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (styleInput.trim() && !isGenerating) {
-      const newStyle = await generateStyle(styleInput)
+      await generateStyle(styleInput)
       setStyleInput('')
     }
   }
 
   const handleApplyStyle = () => {
     if (latestStylePreset) {
+      // First add the style preset to the list
       addStylePreset(latestStylePreset)
+      // Then apply it to assets and scene objects
       setCurrentStyle(latestStylePreset.id)
     }
   }
@@ -192,6 +196,14 @@ export default function AIPanel() {
 
         {activeTab === 'assets' ? (
           <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              className="w-full px-3 py-2 mb-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="Asset name (optional, e.g., 'My Building')..."
+              value={assetName}
+              onChange={(e) => setAssetName(e.target.value)}
+              disabled={isGenerating}
+            />
             <textarea
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
               rows={3}

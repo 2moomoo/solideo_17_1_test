@@ -8,8 +8,7 @@ import {
   Redo,
   Save,
   FolderOpen,
-  LayoutGrid,
-  Eye
+  LayoutGrid
 } from 'lucide-react'
 import { useSceneStore } from '../stores/sceneStore'
 
