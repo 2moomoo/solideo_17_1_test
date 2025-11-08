@@ -1,11 +1,11 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 
-let genAI: GoogleGenerativeAI | null = null
+let genAI: GoogleGenAI | null = null
 
 if (API_KEY) {
-  genAI = new GoogleGenerativeAI(API_KEY)
+  genAI = new GoogleGenAI({ apiKey: API_KEY })
 } else {
   console.warn('Gemini API key not found. AI features will use mock data.')
 }
@@ -75,8 +75,6 @@ export async function generateStyledLayout(request: StyledLayoutRequest): Promis
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
     const prompt = `You are a creative tech stack visualization designer. Create a styled layout where each technology is represented with simple polygon shapes.
 
 Selected Technologies: ${request.selectedStacks.join(', ')}
@@ -143,9 +141,12 @@ RESPONSE FORMAT (JSON):
 
 Generate the styled layout now (return ONLY valid JSON):`
 
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
+    const response = await genAI.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: prompt
+    })
+
+    const text = response.text || ''
 
     // Try to parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/)
@@ -174,8 +175,6 @@ export async function generateTechStackIcon(request: TechStackIconRequest): Prom
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
     const prompt = `You are a tech icon designer. Create a tech stack icon by breaking it down into individual polygon paths.
 
 Description: ${request.description}
@@ -216,9 +215,12 @@ RESPONSE FORMAT (JSON):
 
 Generate the tech stack icon now:`
 
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
+    const response = await genAI.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: prompt
+    })
+
+    const text = response.text || ''
 
     // Try to parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/)
@@ -249,8 +251,6 @@ export async function generateSVGShape(request: SVGShapeRequest): Promise<SVGSha
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
     const prompt = `You are an SVG path generator. Generate a VALID SVG path for the following description.
 
 Description: ${request.description}
@@ -273,9 +273,12 @@ RESPONSE FORMAT (JSON):
 
 Generate the SVG shape now:`
 
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
+    const response = await genAI.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: prompt
+    })
+
+    const text = response.text || ''
 
     // Try to parse JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/)
@@ -320,8 +323,6 @@ export async function generateDiagram(prompt: string): Promise<{
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
     const aiPrompt = `You are a system architecture diagram generator. Create a diagram based on the user's request.
 
 User request: ${prompt}
@@ -357,9 +358,12 @@ Rules:
 
 Generate now:`
 
-    const result = await model.generateContent(aiPrompt)
-    const response = await result.response
-    const text = response.text()
+    const response = await genAI.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: aiPrompt
+    })
+
+    const text = response.text || ''
 
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/)
