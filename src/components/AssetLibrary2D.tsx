@@ -6,7 +6,7 @@ import type { DiagramNode } from '../types'
 
 export default function AssetLibrary2D() {
   const { filteredAssets, searchAssets, filterByCategory, selectedCategory } = useAssetStore()
-  const { addNode } = useDiagramStore()
+  const { addNode, nodes } = useDiagramStore()
   const [searchValue, setSearchValue] = useState('')
 
   const categories = ['All', 'Language', 'Framework', 'Database', 'Tools']
@@ -20,17 +20,34 @@ export default function AssetLibrary2D() {
     filterByCategory(category === 'All' ? null : category)
   }
 
+  // Find a good position that doesn't overlap with existing nodes
+  const findGoodPosition = () => {
+    const nodeWidth = 180
+    const nodeHeight = 140
+    const spacing = 50
+    const columns = 4
+
+    // Calculate grid position based on current node count
+    const index = nodes.length
+    const col = index % columns
+    const row = Math.floor(index / columns)
+
+    return {
+      x: 100 + col * (nodeWidth + spacing),
+      y: 100 + row * (nodeHeight + spacing)
+    }
+  }
+
   const handleAssetClick = (asset: any) => {
     console.log('AssetLibrary2D: Clicked asset', asset)
+
+    const position = findGoodPosition()
 
     // Create a new 2D node from the asset
     const newNode: DiagramNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type: 'custom',
-      position: {
-        x: Math.random() * 400 + 200,
-        y: Math.random() * 300 + 150
-      },
+      position,
       data: {
         label: asset.displayText || asset.name,
         icon: asset.thumbnail,

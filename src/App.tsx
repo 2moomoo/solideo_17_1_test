@@ -70,7 +70,7 @@ function App() {
         </div>
 
         {/* 2D Canvas (Main) */}
-        <div className="flex-1 relative bg-gray-100">
+        <div className="flex-1 relative bg-gradient-to-br from-gray-50 to-blue-50">
           <Canvas2D
             nodes={nodes}
             edges={edges}
