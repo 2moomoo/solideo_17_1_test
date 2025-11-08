@@ -250,17 +250,10 @@ function renderGeometry(object: SceneObject) {
 }
 
 export default function SceneObjects() {
-  const { objects, clearSelection } = useSceneStore()
-
-  const handleBackgroundClick = (e: any) => {
-    // Only clear selection if clicking on background (not on an object)
-    if (e.eventObject === e.object) {
-      clearSelection()
-    }
-  }
+  const { objects } = useSceneStore()
 
   return (
-    <group onClick={handleBackgroundClick}>
+    <group>
       {objects.map((object) => (
         <SceneObjectMesh key={object.id} object={object} />
       ))}

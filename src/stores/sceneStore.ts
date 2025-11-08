@@ -147,12 +147,19 @@ export const useSceneStore = create<SceneState>((set) => ({
   }),
 
   applyStyleToObjects: (style) => set((state) => {
+    // Valid categories that can be styled (exclude AI Generated)
+    const validCategories = ['Language', 'Framework', 'Database', 'Tools']
+
     // Update objects with new geometry based on style
     const updatedObjects = state.objects.map(obj => {
-      if (!obj.category) return obj
+      // Don't apply style to objects without category or AI Generated objects
+      if (!obj.category || obj.category === 'AI Generated') {
+        return obj
+      }
 
-      const category = obj.category as keyof typeof style.categoryMappings
-      if (category in style.categoryMappings) {
+      // Only apply to valid categories that exist in the style mapping
+      if (validCategories.includes(obj.category) && obj.category in style.categoryMappings) {
+        const category = obj.category as keyof typeof style.categoryMappings
         const newGeometryType = style.categoryMappings[category]
         return {
           ...obj,
@@ -160,6 +167,7 @@ export const useSceneStore = create<SceneState>((set) => ({
           geometryParams: getGeometryParams(newGeometryType)
         }
       }
+
       return obj
     })
 

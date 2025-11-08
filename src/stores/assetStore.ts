@@ -394,10 +394,19 @@ export const useAssetStore = create<AssetState>((set, get) => ({
 
     if (!style) return
 
+    // Valid categories that can be styled (exclude AI Generated)
+    const validCategories = ['Language', 'Framework', 'Database', 'Tools']
+
     // Update assets with new geometry based on style
     const updatedAssets = assets.map(asset => {
-      const category = asset.category as keyof typeof style.categoryMappings
-      if (category in style.categoryMappings) {
+      // Don't apply style to AI Generated assets
+      if (asset.category === 'AI Generated') {
+        return asset
+      }
+
+      // Only apply to valid categories that exist in the style mapping
+      if (validCategories.includes(asset.category) && asset.category in style.categoryMappings) {
+        const category = asset.category as keyof typeof style.categoryMappings
         const newGeometryType = style.categoryMappings[category]
         return {
           ...asset,
@@ -405,6 +414,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
           geometryParams: getGeometryParams(newGeometryType)
         }
       }
+
       return asset
     })
 
