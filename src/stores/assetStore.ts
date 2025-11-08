@@ -379,11 +379,21 @@ export const useAssetStore = create<AssetState>((set, get) => ({
     filteredAssets: [...state.filteredAssets, asset]
   })),
 
-  addStylePreset: (preset) => set((state) => ({
-    stylePresets: [...state.stylePresets, preset]
-  })),
+  addStylePreset: (preset) => set((state) => {
+    // Check if preset already exists
+    const exists = state.stylePresets.find(p => p.id === preset.id)
+    if (exists) {
+      console.log('Style preset already exists:', preset.id)
+      return state
+    }
+    console.log('Adding new style preset:', preset)
+    return {
+      stylePresets: [...state.stylePresets, preset]
+    }
+  }),
 
   setCurrentStyle: (styleId) => {
+    console.log('setCurrentStyle called with:', styleId)
     set({ currentStyleId: styleId })
     get().applyStyleToAssets(styleId)
   },
@@ -394,8 +404,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
 
     if (!style) return
 
-    // Valid categories that can be styled (exclude AI Generated)
-    const validCategories = ['Language', 'Framework', 'Database', 'Tools']
+    console.log('Applying style to assets:', style)
 
     // Update assets with new geometry based on style
     const updatedAssets = assets.map(asset => {
@@ -404,10 +413,11 @@ export const useAssetStore = create<AssetState>((set, get) => ({
         return asset
       }
 
-      // Only apply to valid categories that exist in the style mapping
-      if (validCategories.includes(asset.category) && asset.category in style.categoryMappings) {
+      // Check if the asset's category exists in the style mappings
+      if (asset.category && asset.category in style.categoryMappings) {
         const category = asset.category as keyof typeof style.categoryMappings
         const newGeometryType = style.categoryMappings[category]
+        console.log(`Asset ${asset.name}: ${asset.geometryType} -> ${newGeometryType}`)
         return {
           ...asset,
           geometryType: newGeometryType,

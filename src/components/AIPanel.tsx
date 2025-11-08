@@ -39,9 +39,11 @@ export default function AIPanel() {
 
   const handleApplyStyle = () => {
     if (latestStylePreset) {
+      console.log('Applying AI generated style:', latestStylePreset)
       // First add the style preset to the list
       addStylePreset(latestStylePreset)
       // Then apply it to assets and scene objects
+      console.log('Setting current style to:', latestStylePreset.id)
       setCurrentStyle(latestStylePreset.id)
     }
   }

@@ -147,20 +147,24 @@ export const useSceneStore = create<SceneState>((set) => ({
   }),
 
   applyStyleToObjects: (style) => set((state) => {
-    // Valid categories that can be styled (exclude AI Generated)
-    const validCategories = ['Language', 'Framework', 'Database', 'Tools']
+    console.log('Applying style to objects:', style)
+    console.log('Current objects:', state.objects)
 
     // Update objects with new geometry based on style
     const updatedObjects = state.objects.map(obj => {
-      // Don't apply style to objects without category or AI Generated objects
-      if (!obj.category || obj.category === 'AI Generated') {
+      console.log(`Processing object: ${obj.name}, category: ${obj.category}`)
+
+      // Don't apply style to AI Generated objects
+      if (obj.category === 'AI Generated') {
+        console.log('  -> Skipping AI Generated object')
         return obj
       }
 
-      // Only apply to valid categories that exist in the style mapping
-      if (validCategories.includes(obj.category) && obj.category in style.categoryMappings) {
+      // Check if the object's category exists in the style mappings
+      if (obj.category && obj.category in style.categoryMappings) {
         const category = obj.category as keyof typeof style.categoryMappings
         const newGeometryType = style.categoryMappings[category]
+        console.log(`  -> Applying style: ${obj.geometryType} -> ${newGeometryType}`)
         return {
           ...obj,
           geometryType: newGeometryType,
@@ -168,9 +172,11 @@ export const useSceneStore = create<SceneState>((set) => ({
         }
       }
 
+      console.log('  -> No style mapping found')
       return obj
     })
 
+    console.log('Updated objects:', updatedObjects)
     return { objects: updatedObjects }
   })
 }))
