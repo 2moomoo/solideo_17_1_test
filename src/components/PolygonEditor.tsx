@@ -1,11 +1,11 @@
-import { useIconStore } from '../stores/iconStore'
+import { useLayoutStore } from '../stores/layoutStore'
 
 export default function PolygonEditor() {
-  const { selectedIconId, selectedPolygonId, getSelectedPolygon, updatePolygon } = useIconStore()
+  const { selectedPolygonId, getSelectedPolygon, updatePolygon } = useLayoutStore()
 
   const selectedPolygon = getSelectedPolygon()
 
-  if (!selectedIconId || !selectedPolygonId || !selectedPolygon) {
+  if (!selectedPolygonId || !selectedPolygon) {
     return (
       <div className="w-80 bg-white border-l border-gray-200 p-6 flex items-center justify-center text-gray-400">
         <div className="text-center">
@@ -20,8 +20,8 @@ export default function PolygonEditor() {
   }
 
   const handleUpdate = (updates: Partial<typeof selectedPolygon>) => {
-    if (selectedIconId && selectedPolygonId) {
-      updatePolygon(selectedIconId, selectedPolygonId, updates)
+    if (selectedPolygonId) {
+      updatePolygon(selectedPolygonId, updates)
     }
   }
 

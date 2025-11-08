@@ -1,60 +1,96 @@
-import { useRef, useEffect } from 'react'
-import { Stage, Layer, Path, Group, Transformer } from 'react-konva'
-import { useIconStore } from '../stores/iconStore'
+import { useRef, useImperativeHandle, forwardRef } from 'react'
+import { Stage, Layer, Path, Group, Text } from 'react-konva'
+import { useLayoutStore } from '../stores/layoutStore'
 import Konva from 'konva'
 
-export default function PolygonCanvas() {
-  const { icons, selectedIconId, selectedPolygonId, selectIcon, selectPolygon, updateIconPosition } = useIconStore()
-  const transformerRef = useRef<Konva.Transformer>(null)
+export interface PolygonCanvasRef {
+  exportImage: () => string
+}
+
+const PolygonCanvas = forwardRef<PolygonCanvasRef>((_props, ref) => {
+  const {
+    elements,
+    backgroundPolygons,
+    selectedPolygonId,
+    selectPolygon,
+    updateElementPosition
+  } = useLayoutStore()
+
   const selectedShapeRef = useRef<Konva.Path>(null)
+  const stageRef = useRef<Konva.Stage>(null)
 
-  // Update transformer when selection changes
-  useEffect(() => {
-    if (transformerRef.current && selectedShapeRef.current) {
-      transformerRef.current.nodes([selectedShapeRef.current])
-      transformerRef.current.getLayer()?.batchDraw()
+  useImperativeHandle(ref, () => ({
+    exportImage: () => {
+      if (stageRef.current) {
+        return stageRef.current.toDataURL({ pixelRatio: 2 })
+      }
+      return ''
     }
-  }, [selectedPolygonId])
+  }))
 
-  const handleIconDragEnd = (iconId: string, e: Konva.KonvaEventObject<DragEvent>) => {
+  const handleElementDragEnd = (elementId: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target
-    updateIconPosition(iconId, {
+    updateElementPosition(elementId, {
       x: node.x(),
       y: node.y()
     })
   }
 
-  const handlePolygonClick = (iconId: string, polygonId: string) => {
-    selectIcon(iconId)
+  const handlePolygonClick = (polygonId: string, e: Konva.KonvaEventObject<MouseEvent | TouchEvent | Event>) => {
+    e.cancelBubble = true
     selectPolygon(polygonId)
   }
 
   const handleStageClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
     // Deselect when clicking on empty area
     if (e.target === e.target.getStage()) {
-      selectIcon(null)
       selectPolygon(null)
     }
   }
 
   return (
-    <div className="flex-1 bg-gradient-to-br from-gray-50 to-blue-50 overflow-hidden">
+    <div className="flex-1 bg-gradient-to-br from-sky-100 to-blue-200 overflow-hidden relative">
       <Stage
-        width={window.innerWidth - 500} // Leave space for right panel
-        height={window.innerHeight}
+        ref={stageRef}
+        width={window.innerWidth - 640} // Leave space for left and right panels
+        height={window.innerHeight - 56} // Leave space for top bar
         onClick={handleStageClick}
       >
         <Layer>
-          {icons.map((icon) => (
+          {/* Background polygons (platform, rails, etc.) */}
+          {backgroundPolygons.map((polygon) => {
+            const isSelected = selectedPolygonId === polygon.id
+
+            return (
+              <Path
+                key={polygon.id}
+                ref={isSelected ? selectedShapeRef : null}
+                data={polygon.svgPath}
+                fill={polygon.fill}
+                stroke={polygon.stroke}
+                strokeWidth={polygon.strokeWidth}
+                opacity={polygon.opacity || 1}
+                onClick={(e) => handlePolygonClick(polygon.id, e)}
+                onTap={(e) => handlePolygonClick(polygon.id, e)}
+                listening={true}
+                shadowColor={isSelected ? '#FFD700' : undefined}
+                shadowBlur={isSelected ? 15 : 0}
+                shadowOpacity={isSelected ? 0.8 : 0}
+              />
+            )
+          })}
+
+          {/* Tech stack elements (trains, etc.) */}
+          {elements.map((element) => (
             <Group
-              key={icon.id}
-              x={icon.position.x}
-              y={icon.position.y}
+              key={element.id}
+              x={element.position.x}
+              y={element.position.y}
               draggable
-              onDragEnd={(e) => handleIconDragEnd(icon.id, e)}
+              onDragEnd={(e) => handleElementDragEnd(element.id, e)}
             >
-              {icon.polygons.map((polygon) => {
-                const isSelected = selectedIconId === icon.id && selectedPolygonId === polygon.id
+              {element.polygons.map((polygon) => {
+                const isSelected = selectedPolygonId === polygon.id
 
                 return (
                   <Path
@@ -65,34 +101,55 @@ export default function PolygonCanvas() {
                     stroke={polygon.stroke}
                     strokeWidth={polygon.strokeWidth}
                     opacity={polygon.opacity || 1}
-                    onClick={() => handlePolygonClick(icon.id, polygon.id)}
-                    onTap={() => handlePolygonClick(icon.id, polygon.id)}
-                    draggable={false}
+                    onClick={(e) => handlePolygonClick(polygon.id, e)}
+                    onTap={(e) => handlePolygonClick(polygon.id, e)}
                     listening={true}
-                    shadowColor={isSelected ? '#4A90E2' : undefined}
-                    shadowBlur={isSelected ? 10 : 0}
-                    shadowOpacity={isSelected ? 0.5 : 0}
+                    shadowColor={isSelected ? '#FFD700' : undefined}
+                    shadowBlur={isSelected ? 15 : 0}
+                    shadowOpacity={isSelected ? 0.8 : 0}
                   />
                 )
               })}
+
+              {/* Label */}
+              {element.label && (
+                <Text
+                  text={element.label}
+                  x={0}
+                  y={-40}
+                  width={180}
+                  align="center"
+                  fontSize={16}
+                  fontFamily="Arial"
+                  fontStyle="bold"
+                  fill="#333333"
+                  listening={false}
+                />
+              )}
             </Group>
           ))}
-
-          {/* Transformer for selected polygon */}
-          {selectedPolygonId && (
-            <Transformer
-              ref={transformerRef}
-              boundBoxFunc={(oldBox, newBox) => {
-                // Limit resize
-                if (newBox.width < 5 || newBox.height < 5) {
-                  return oldBox
-                }
-                return newBox
-              }}
-            />
-          )}
         </Layer>
       </Stage>
+
+      {/* Instructions overlay */}
+      {elements.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="bg-white bg-opacity-90 rounded-xl shadow-2xl p-8 max-w-md text-center">
+            <div className="text-6xl mb-4">🚂</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Ready to Design!</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Select tech stacks on the left and click "Generate Design" to create your visualization
+            </p>
+            <div className="text-xs text-gray-500">
+              Try: "Train station platform" style
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
-}
+})
+
+PolygonCanvas.displayName = 'PolygonCanvas'
+
+export default PolygonCanvas

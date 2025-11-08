@@ -45,6 +45,126 @@ export interface TechStackIconResponse {
   viewBox: { width: number; height: number }
 }
 
+export interface TechStackElement {
+  id: string
+  techName: string
+  position: { x: number; y: number }
+  polygons: PolygonPath[]
+  label?: string
+}
+
+export interface StyledLayoutRequest {
+  selectedStacks: string[] // e.g., ['react', 'nodejs', 'mongodb']
+  styleDescription: string // e.g., "train station platform with each tech as a train car"
+  canvasWidth?: number
+  canvasHeight?: number
+}
+
+export interface StyledLayoutResponse {
+  elements: TechStackElement[]
+  backgroundPolygons?: PolygonPath[] // Optional background elements (platform, rails, etc.)
+  description: string
+}
+
+/**
+ * Generate styled layout with selected tech stacks using Gemini AI
+ */
+export async function generateStyledLayout(request: StyledLayoutRequest): Promise<StyledLayoutResponse> {
+  if (!genAI) {
+    return generateMockStyledLayout(request)
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' })
+
+    const prompt = `You are a creative tech stack visualization designer. Create a styled layout where each technology is represented with simple polygon shapes.
+
+Selected Technologies: ${request.selectedStacks.join(', ')}
+Style Theme: ${request.styleDescription}
+Canvas Size: ${request.canvasWidth || 1200}x${request.canvasHeight || 800}
+
+IMPORTANT RULES:
+1. Create visual elements for EACH selected technology
+2. Each tech element should have 2-5 simple polygons (rectangles, triangles, circles as polygons)
+3. Design elements according to the style theme
+4. Position elements logically in the canvas
+5. Add optional background polygons if they enhance the theme (platform, rails, roads, etc.)
+6. Use colors that match the tech's brand or theme
+7. Keep polygons simple and editable
+
+RESPONSE FORMAT (JSON):
+{
+  "description": "Train station platform with React, Node.js, and MongoDB as train cars",
+  "backgroundPolygons": [
+    {
+      "id": "bg-platform",
+      "svgPath": "M 0 600 L 1200 600 L 1200 650 L 0 650 Z",
+      "fill": "#8B7355",
+      "stroke": "#654321",
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "bg-rail-1",
+      "svgPath": "M 0 650 L 1200 650 L 1200 655 L 0 655 Z",
+      "fill": "#333333",
+      "stroke": "#222222",
+      "strokeWidth": 1,
+      "opacity": 1
+    }
+  ],
+  "elements": [
+    {
+      "id": "tech-react",
+      "techName": "React",
+      "position": { "x": 100, "y": 450 },
+      "label": "React",
+      "polygons": [
+        {
+          "id": "react-car-body",
+          "svgPath": "M 0 0 L 150 0 L 150 120 L 0 120 Z",
+          "fill": "#61dafb",
+          "stroke": "#00d8ff",
+          "strokeWidth": 3,
+          "opacity": 1
+        },
+        {
+          "id": "react-car-roof",
+          "svgPath": "M 10 0 L 140 0 L 120 -30 L 30 -30 Z",
+          "fill": "#4fa8c5",
+          "stroke": "#00d8ff",
+          "strokeWidth": 2,
+          "opacity": 1
+        }
+      ]
+    }
+  ]
+}
+
+Generate the styled layout now (return ONLY valid JSON):`
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    const text = response.text()
+
+    // Try to parse JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0])
+      return {
+        description: parsed.description || request.styleDescription,
+        elements: parsed.elements || [],
+        backgroundPolygons: parsed.backgroundPolygons || []
+      }
+    }
+
+    throw new Error('Failed to parse AI response')
+  } catch (error) {
+    console.error('Gemini API error:', error)
+    return generateMockStyledLayout(request)
+  }
+}
+
 /**
  * Generate tech stack icon with individual editable polygons using Gemini AI
  */
@@ -366,6 +486,109 @@ function generateMockTechStackIcon(request: TechStackIconRequest): TechStackIcon
         opacity: 1
       }
     ]
+  }
+}
+
+/**
+ * Mock styled layout generator (fallback)
+ */
+function generateMockStyledLayout(request: StyledLayoutRequest): StyledLayoutResponse {
+  const width = request.canvasWidth || 1200
+  const height = request.canvasHeight || 800
+
+  // Generate train station platform style
+  const elements: TechStackElement[] = request.selectedStacks.map((techName, index) => {
+    const xPos = 150 + index * 250
+    const yPos = height * 0.55
+
+    const colors: Record<string, string> = {
+      react: '#61dafb',
+      vue: '#42b883',
+      angular: '#dd0031',
+      nodejs: '#339933',
+      python: '#3776ab',
+      mongodb: '#47a248',
+      postgresql: '#336791',
+      docker: '#2496ed',
+      kubernetes: '#326ce5'
+    }
+
+    const color = colors[techName.toLowerCase()] || '#4A90E2'
+
+    return {
+      id: `tech-${techName}-${index}`,
+      techName,
+      position: { x: xPos, y: yPos },
+      label: techName,
+      polygons: [
+        {
+          id: `${techName}-car-body`,
+          svgPath: 'M 0 0 L 180 0 L 180 100 L 0 100 Z',
+          fill: color,
+          stroke: adjustColor(color, -30),
+          strokeWidth: 3,
+          opacity: 1
+        },
+        {
+          id: `${techName}-car-roof`,
+          svgPath: 'M 15 0 L 165 0 L 145 -25 L 35 -25 Z',
+          fill: adjustColor(color, -20),
+          stroke: adjustColor(color, -30),
+          strokeWidth: 2,
+          opacity: 1
+        },
+        {
+          id: `${techName}-wheel-1`,
+          svgPath: 'M 30 100 C 30 85 45 85 45 100 C 45 115 30 115 30 100 Z',
+          fill: '#333333',
+          stroke: '#222222',
+          strokeWidth: 2,
+          opacity: 1
+        },
+        {
+          id: `${techName}-wheel-2`,
+          svgPath: 'M 135 100 C 135 85 150 85 150 100 C 150 115 135 115 135 100 Z',
+          fill: '#333333',
+          stroke: '#222222',
+          strokeWidth: 2,
+          opacity: 1
+        }
+      ]
+    }
+  })
+
+  // Background: platform and rails
+  const backgroundPolygons: PolygonPath[] = [
+    {
+      id: 'bg-platform',
+      svgPath: `M 0 ${height * 0.75} L ${width} ${height * 0.75} L ${width} ${height * 0.82} L 0 ${height * 0.82} Z`,
+      fill: '#8B7355',
+      stroke: '#654321',
+      strokeWidth: 2,
+      opacity: 1
+    },
+    {
+      id: 'bg-rail-1',
+      svgPath: `M 0 ${height * 0.82} L ${width} ${height * 0.82} L ${width} ${height * 0.825} L 0 ${height * 0.825} Z`,
+      fill: '#333333',
+      stroke: '#222222',
+      strokeWidth: 1,
+      opacity: 1
+    },
+    {
+      id: 'bg-rail-2',
+      svgPath: `M 0 ${height * 0.86} L ${width} ${height * 0.86} L ${width} ${height * 0.865} L 0 ${height * 0.865} Z`,
+      fill: '#333333',
+      stroke: '#222222',
+      strokeWidth: 1,
+      opacity: 1
+    }
+  ]
+
+  return {
+    description: `Train station platform with ${request.selectedStacks.join(', ')} as train cars`,
+    elements,
+    backgroundPolygons
   }
 }
 
