@@ -45,6 +45,15 @@ export interface TechStackIconResponse {
   viewBox: { width: number; height: number }
 }
 
+export interface StyleTemplate {
+  name: string
+  description: string
+  elementTemplate: PolygonPath[]  // Template for ONE element (uses relative coordinates 0-100)
+  backgroundPolygons?: PolygonPath[]  // Background elements (absolute coordinates)
+  elementWidth: number  // Template size
+  elementHeight: number
+}
+
 export interface TechStackElement {
   id: string
   techName: string
@@ -67,79 +76,81 @@ export interface StyledLayoutResponse {
 }
 
 /**
- * Generate styled layout with selected tech stacks using Gemini AI
+ * Generate style template from AI (ONE template for all elements)
  */
-export async function generateStyledLayout(request: StyledLayoutRequest): Promise<StyledLayoutResponse> {
+export async function generateStyleTemplate(styleDescription: string, canvasWidth: number, canvasHeight: number): Promise<StyleTemplate> {
   if (!genAI) {
-    return generateMockStyledLayout(request)
+    return generateMockStyleTemplate(styleDescription, canvasWidth, canvasHeight)
   }
 
   try {
-    const prompt = `You are a creative tech stack visualization designer. Create a styled layout where each technology is represented with simple polygon shapes.
+    const prompt = `You are a creative visualization designer. Create a SINGLE reusable template that represents this style:
 
-Selected Technologies: ${request.selectedStacks.join(', ')}
-Style Theme: ${request.styleDescription}
-Canvas Size: ${request.canvasWidth || 1200}x${request.canvasHeight || 800}
+Style Theme: ${styleDescription}
+Canvas Size: ${canvasWidth}x${canvasHeight}
+Template Size: Approximately 180x120 pixels
 
 IMPORTANT RULES:
-1. Create visual elements for EACH selected technology
-2. Each tech element should have 2-5 simple polygons (rectangles, triangles, circles as polygons)
-3. Design elements according to the style theme
-4. Position elements logically in the canvas
-5. Add optional background polygons if they enhance the theme (platform, rails, roads, etc.)
-6. Use colors that match the tech's brand or theme
-7. Keep polygons simple and editable
+1. Create ONE reusable template (not for specific technologies)
+2. Template should have 2-5 simple polygons
+3. Use RELATIVE coordinates (0-180 width, 0-120 height range)
+4. Use neutral placeholder colors (will be replaced per-tech)
+5. Add optional background polygons (platform, rails, etc.) with ABSOLUTE coordinates
+6. Keep it simple and editable
 
 RESPONSE FORMAT (JSON):
 {
-  "description": "Train station platform with React, Node.js, and MongoDB as train cars",
-  "backgroundPolygons": [
+  "name": "Train Car",
+  "description": "A simple train car shape",
+  "elementWidth": 180,
+  "elementHeight": 120,
+  "elementTemplate": [
     {
-      "id": "bg-platform",
-      "svgPath": "M 0 600 L 1200 600 L 1200 650 L 0 650 Z",
-      "fill": "#8B7355",
-      "stroke": "#654321",
+      "id": "body",
+      "svgPath": "M 0 20 L 180 20 L 180 120 L 0 120 Z",
+      "fill": "#PLACEHOLDER",
+      "stroke": "#000000",
+      "strokeWidth": 3,
+      "opacity": 1
+    },
+    {
+      "id": "roof",
+      "svgPath": "M 15 20 L 165 20 L 145 0 L 35 0 Z",
+      "fill": "#PLACEHOLDER",
+      "stroke": "#000000",
       "strokeWidth": 2,
       "opacity": 1
     },
     {
-      "id": "bg-rail-1",
-      "svgPath": "M 0 650 L 1200 650 L 1200 655 L 0 655 Z",
+      "id": "wheel-1",
+      "svgPath": "M 30 120 C 30 105 45 105 45 120 C 45 135 30 135 30 120 Z",
       "fill": "#333333",
       "stroke": "#222222",
-      "strokeWidth": 1,
+      "strokeWidth": 2,
+      "opacity": 1
+    },
+    {
+      "id": "wheel-2",
+      "svgPath": "M 135 120 C 135 105 150 105 150 120 C 150 135 135 135 135 120 Z",
+      "fill": "#333333",
+      "stroke": "#222222",
+      "strokeWidth": 2,
       "opacity": 1
     }
   ],
-  "elements": [
+  "backgroundPolygons": [
     {
-      "id": "tech-react",
-      "techName": "React",
-      "position": { "x": 100, "y": 450 },
-      "label": "React",
-      "polygons": [
-        {
-          "id": "react-car-body",
-          "svgPath": "M 0 0 L 150 0 L 150 120 L 0 120 Z",
-          "fill": "#61dafb",
-          "stroke": "#00d8ff",
-          "strokeWidth": 3,
-          "opacity": 1
-        },
-        {
-          "id": "react-car-roof",
-          "svgPath": "M 10 0 L 140 0 L 120 -30 L 30 -30 Z",
-          "fill": "#4fa8c5",
-          "stroke": "#00d8ff",
-          "strokeWidth": 2,
-          "opacity": 1
-        }
-      ]
+      "id": "platform",
+      "svgPath": "M 0 ${canvasHeight * 0.75} L ${canvasWidth} ${canvasHeight * 0.75} L ${canvasWidth} ${canvasHeight * 0.82} L 0 ${canvasHeight * 0.82} Z",
+      "fill": "#8B7355",
+      "stroke": "#654321",
+      "strokeWidth": 2,
+      "opacity": 1
     }
   ]
 }
 
-Generate the styled layout now (return ONLY valid JSON):`
+Generate the style template now (return ONLY valid JSON):`
 
     const response = await genAI.models.generateContent({
       model: 'gemini-2.0-flash-exp',
@@ -153,8 +164,11 @@ Generate the styled layout now (return ONLY valid JSON):`
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0])
       return {
-        description: parsed.description || request.styleDescription,
-        elements: parsed.elements || [],
+        name: parsed.name || 'Style Template',
+        description: parsed.description || styleDescription,
+        elementWidth: parsed.elementWidth || 180,
+        elementHeight: parsed.elementHeight || 120,
+        elementTemplate: parsed.elementTemplate || [],
         backgroundPolygons: parsed.backgroundPolygons || []
       }
     }
@@ -162,8 +176,79 @@ Generate the styled layout now (return ONLY valid JSON):`
     throw new Error('Failed to parse AI response')
   } catch (error) {
     console.error('Gemini API error:', error)
-    return generateMockStyledLayout(request)
+    return generateMockStyleTemplate(styleDescription, canvasWidth, canvasHeight)
   }
+}
+
+/**
+ * Apply style template to selected tech stacks
+ */
+function applyStyleToStacks(
+  template: StyleTemplate,
+  selectedStacks: string[],
+  _canvasWidth: number,
+  canvasHeight: number
+): StyledLayoutResponse {
+  const techColors: Record<string, string> = {
+    react: '#61dafb',
+    vue: '#42b883',
+    angular: '#dd0031',
+    svelte: '#ff3e00',
+    nodejs: '#339933',
+    python: '#3776ab',
+    java: '#007396',
+    go: '#00add8',
+    mongodb: '#47a248',
+    postgresql: '#336791',
+    mysql: '#4479a1',
+    redis: '#dc382d',
+    docker: '#2496ed',
+    kubernetes: '#326ce5',
+    aws: '#ff9900',
+    github: '#181717'
+  }
+
+  const elements: TechStackElement[] = selectedStacks.map((techName, index) => {
+    const color = techColors[techName.toLowerCase()] || '#4A90E2'
+    const xPos = 150 + index * (template.elementWidth + 50)
+    const yPos = canvasHeight * 0.55
+
+    // Clone template polygons and replace colors
+    const polygons = template.elementTemplate.map((polygon, polyIndex) => ({
+      ...polygon,
+      id: `${techName}-${polygon.id}-${polyIndex}`,
+      fill: polygon.fill === '#PLACEHOLDER' ? color : polygon.fill,
+      stroke: polygon.stroke === '#PLACEHOLDER' ? adjustColor(color, -30) : polygon.stroke
+    }))
+
+    return {
+      id: `tech-${techName}-${index}`,
+      techName,
+      position: { x: xPos, y: yPos },
+      label: techName,
+      polygons
+    }
+  })
+
+  return {
+    description: `${template.description} with ${selectedStacks.join(', ')}`,
+    elements,
+    backgroundPolygons: template.backgroundPolygons || []
+  }
+}
+
+/**
+ * Generate styled layout with selected tech stacks using Gemini AI
+ */
+export async function generateStyledLayout(request: StyledLayoutRequest): Promise<StyledLayoutResponse> {
+  const canvasWidth = request.canvasWidth || 1200
+  const canvasHeight = request.canvasHeight || 800
+
+  // Step 1: Get style template from AI
+  const template = await generateStyleTemplate(request.styleDescription, canvasWidth, canvasHeight)
+
+  // Step 2: Apply template to all selected stacks
+  return applyStyleToStacks(template, request.selectedStacks, canvasWidth, canvasHeight)
 }
 
 /**
@@ -494,105 +579,74 @@ function generateMockTechStackIcon(request: TechStackIconRequest): TechStackIcon
 }
 
 /**
- * Mock styled layout generator (fallback)
+ * Mock style template generator (fallback)
  */
-function generateMockStyledLayout(request: StyledLayoutRequest): StyledLayoutResponse {
-  const width = request.canvasWidth || 1200
-  const height = request.canvasHeight || 800
-
-  // Generate train station platform style
-  const elements: TechStackElement[] = request.selectedStacks.map((techName, index) => {
-    const xPos = 150 + index * 250
-    const yPos = height * 0.55
-
-    const colors: Record<string, string> = {
-      react: '#61dafb',
-      vue: '#42b883',
-      angular: '#dd0031',
-      nodejs: '#339933',
-      python: '#3776ab',
-      mongodb: '#47a248',
-      postgresql: '#336791',
-      docker: '#2496ed',
-      kubernetes: '#326ce5'
-    }
-
-    const color = colors[techName.toLowerCase()] || '#4A90E2'
-
-    return {
-      id: `tech-${techName}-${index}`,
-      techName,
-      position: { x: xPos, y: yPos },
-      label: techName,
-      polygons: [
-        {
-          id: `${techName}-car-body`,
-          svgPath: 'M 0 0 L 180 0 L 180 100 L 0 100 Z',
-          fill: color,
-          stroke: adjustColor(color, -30),
-          strokeWidth: 3,
-          opacity: 1
-        },
-        {
-          id: `${techName}-car-roof`,
-          svgPath: 'M 15 0 L 165 0 L 145 -25 L 35 -25 Z',
-          fill: adjustColor(color, -20),
-          stroke: adjustColor(color, -30),
-          strokeWidth: 2,
-          opacity: 1
-        },
-        {
-          id: `${techName}-wheel-1`,
-          svgPath: 'M 30 100 C 30 85 45 85 45 100 C 45 115 30 115 30 100 Z',
-          fill: '#333333',
-          stroke: '#222222',
-          strokeWidth: 2,
-          opacity: 1
-        },
-        {
-          id: `${techName}-wheel-2`,
-          svgPath: 'M 135 100 C 135 85 150 85 150 100 C 150 115 135 115 135 100 Z',
-          fill: '#333333',
-          stroke: '#222222',
-          strokeWidth: 2,
-          opacity: 1
-        }
-      ]
-    }
-  })
-
-  // Background: platform and rails
-  const backgroundPolygons: PolygonPath[] = [
-    {
-      id: 'bg-platform',
-      svgPath: `M 0 ${height * 0.75} L ${width} ${height * 0.75} L ${width} ${height * 0.82} L 0 ${height * 0.82} Z`,
-      fill: '#8B7355',
-      stroke: '#654321',
-      strokeWidth: 2,
-      opacity: 1
-    },
-    {
-      id: 'bg-rail-1',
-      svgPath: `M 0 ${height * 0.82} L ${width} ${height * 0.82} L ${width} ${height * 0.825} L 0 ${height * 0.825} Z`,
-      fill: '#333333',
-      stroke: '#222222',
-      strokeWidth: 1,
-      opacity: 1
-    },
-    {
-      id: 'bg-rail-2',
-      svgPath: `M 0 ${height * 0.86} L ${width} ${height * 0.86} L ${width} ${height * 0.865} L 0 ${height * 0.865} Z`,
-      fill: '#333333',
-      stroke: '#222222',
-      strokeWidth: 1,
-      opacity: 1
-    }
-  ]
-
+function generateMockStyleTemplate(_styleDescription: string, canvasWidth: number, canvasHeight: number): StyleTemplate {
   return {
-    description: `Train station platform with ${request.selectedStacks.join(', ')} as train cars`,
-    elements,
-    backgroundPolygons
+    name: 'Train Car',
+    description: 'Simple train car template',
+    elementWidth: 180,
+    elementHeight: 120,
+    elementTemplate: [
+      {
+        id: 'body',
+        svgPath: 'M 0 20 L 180 20 L 180 120 L 0 120 Z',
+        fill: '#PLACEHOLDER',
+        stroke: '#000000',
+        strokeWidth: 3,
+        opacity: 1
+      },
+      {
+        id: 'roof',
+        svgPath: 'M 15 20 L 165 20 L 145 0 L 35 0 Z',
+        fill: '#PLACEHOLDER',
+        stroke: '#000000',
+        strokeWidth: 2,
+        opacity: 1
+      },
+      {
+        id: 'wheel-1',
+        svgPath: 'M 30 120 C 30 105 45 105 45 120 C 45 135 30 135 30 120 Z',
+        fill: '#333333',
+        stroke: '#222222',
+        strokeWidth: 2,
+        opacity: 1
+      },
+      {
+        id: 'wheel-2',
+        svgPath: 'M 135 120 C 135 105 150 105 150 120 C 150 135 135 135 135 120 Z',
+        fill: '#333333',
+        stroke: '#222222',
+        strokeWidth: 2,
+        opacity: 1
+      }
+    ],
+    backgroundPolygons: [
+      {
+        id: 'platform',
+        svgPath: `M 0 ${canvasHeight * 0.75} L ${canvasWidth} ${canvasHeight * 0.75} L ${canvasWidth} ${canvasHeight * 0.82} L 0 ${canvasHeight * 0.82} Z`,
+        fill: '#8B7355',
+        stroke: '#654321',
+        strokeWidth: 2,
+        opacity: 1
+      },
+      {
+        id: 'rail-1',
+        svgPath: `M 0 ${canvasHeight * 0.82} L ${canvasWidth} ${canvasHeight * 0.82} L ${canvasWidth} ${canvasHeight * 0.825} L 0 ${canvasHeight * 0.825} Z`,
+        fill: '#333333',
+        stroke: '#222222',
+        strokeWidth: 1,
+        opacity: 1
+      },
+      {
+        id: 'rail-2',
+        svgPath: `M 0 ${canvasHeight * 0.86} L ${canvasWidth} ${canvasHeight * 0.86} L ${canvasWidth} ${canvasHeight * 0.865} L 0 ${canvasHeight * 0.865} Z`,
+        fill: '#333333',
+        stroke: '#222222',
+        strokeWidth: 1,
+        opacity: 1
+      }
+    ]
   }
 }
 
