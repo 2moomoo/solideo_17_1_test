@@ -1,4 +1,4 @@
-import { useRef, useImperativeHandle, forwardRef } from 'react'
+import { useRef, useImperativeHandle, forwardRef, useState, useEffect } from 'react'
 import { Stage, Layer, Path, Group, Text } from 'react-konva'
 import { useLayoutStore } from '../stores/layoutStore'
 import Konva from 'konva'
@@ -18,6 +18,23 @@ const PolygonCanvas = forwardRef<PolygonCanvasRef>((_props, ref) => {
 
   const selectedShapeRef = useRef<Konva.Path>(null)
   const stageRef = useRef<Konva.Stage>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        setCanvasSize({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight
+        })
+      }
+    }
+
+    updateSize()
+    window.addEventListener('resize', updateSize)
+    return () => window.removeEventListener('resize', updateSize)
+  }, [])
 
   useImperativeHandle(ref, () => ({
     exportImage: () => {
@@ -49,11 +66,11 @@ const PolygonCanvas = forwardRef<PolygonCanvasRef>((_props, ref) => {
   }
 
   return (
-    <div className="flex-1 bg-gradient-to-br from-sky-100 to-blue-200 overflow-hidden relative">
+    <div ref={containerRef} className="flex-1 bg-gradient-to-br from-sky-100 to-blue-200 overflow-hidden relative">
       <Stage
         ref={stageRef}
-        width={window.innerWidth - 640} // Leave space for left and right panels
-        height={window.innerHeight - 56} // Leave space for top bar
+        width={canvasSize.width}
+        height={canvasSize.height}
         onClick={handleStageClick}
       >
         <Layer>

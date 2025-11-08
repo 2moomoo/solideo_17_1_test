@@ -70,9 +70,9 @@ export default function TechStackSelector({ selectedStacks, onSelectionChange }:
   }
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+    <div className="h-full bg-white border-r border-gray-200 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-gray-200 flex-shrink-0">
         <h2 className="text-lg font-bold text-gray-800 mb-2">Select Tech Stack</h2>
         <p className="text-xs text-gray-600 mb-3">
           Choose technologies to include in your design

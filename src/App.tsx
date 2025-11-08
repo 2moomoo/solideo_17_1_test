@@ -66,12 +66,16 @@ function App() {
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Tech Stack Selection + AI Style */}
-        <div className="flex flex-col">
-          <TechStackSelector
-            selectedStacks={selectedStacks}
-            onSelectionChange={setSelectedStacks}
-          />
-          <AIStylePanel selectedStacks={selectedStacks} />
+        <div className="flex flex-col w-80 overflow-hidden">
+          <div className="flex-1 overflow-hidden">
+            <TechStackSelector
+              selectedStacks={selectedStacks}
+              onSelectionChange={setSelectedStacks}
+            />
+          </div>
+          <div className="flex-shrink-0">
+            <AIStylePanel selectedStacks={selectedStacks} />
+          </div>
         </div>
 
         {/* Center - Canvas */}
