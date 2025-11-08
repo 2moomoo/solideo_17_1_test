@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import ReactFlow, {
   Background,
   Controls,
@@ -28,8 +28,19 @@ interface Canvas2DProps {
 }
 
 export default function Canvas2D({ nodes: initialNodes, edges: initialEdges, onNodesChange, onEdgesChange }: Canvas2DProps) {
-  const [nodes, , handleNodesChange] = useNodesState(initialNodes)
+  const [nodes, setNodes, handleNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, handleEdgesChange] = useEdgesState(initialEdges)
+
+  // Sync internal state with props when they change
+  useEffect(() => {
+    console.log('Canvas2D: Updating nodes from props', initialNodes)
+    setNodes(initialNodes)
+  }, [initialNodes, setNodes])
+
+  useEffect(() => {
+    console.log('Canvas2D: Updating edges from props', initialEdges)
+    setEdges(initialEdges)
+  }, [initialEdges, setEdges])
 
   const onConnect = useCallback(
     (params: Connection) => {

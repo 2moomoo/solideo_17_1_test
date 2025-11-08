@@ -24,17 +24,31 @@ export const useDiagramStore = create<DiagramState>((set) => ({
   edges: [],
   selectedNodeIds: [],
 
-  setNodes: (nodes) => set({ nodes }),
+  setNodes: (nodes) => {
+    console.log('DiagramStore: setNodes called with', nodes)
+    set({ nodes })
+  },
 
-  setEdges: (edges) => set({ edges }),
+  setEdges: (edges) => {
+    console.log('DiagramStore: setEdges called with', edges)
+    set({ edges })
+  },
 
-  addNode: (node) => set((state) => ({
-    nodes: [...state.nodes, node]
-  })),
+  addNode: (node) => {
+    console.log('DiagramStore: addNode called with', node)
+    set((state) => {
+      const newNodes = [...state.nodes, node]
+      console.log('DiagramStore: New nodes array', newNodes)
+      return { nodes: newNodes }
+    })
+  },
 
-  addEdge: (edge) => set((state) => ({
-    edges: [...state.edges, edge]
-  })),
+  addEdge: (edge) => {
+    console.log('DiagramStore: addEdge called with', edge)
+    set((state) => ({
+      edges: [...state.edges, edge]
+    }))
+  },
 
   removeNode: (id) => set((state) => ({
     nodes: state.nodes.filter(n => n.id !== id),

@@ -33,7 +33,7 @@ export async function generateSVGShape(request: SVGShapeRequest): Promise<SVGSha
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' })
 
     const prompt = `You are an SVG path generator. Generate a VALID SVG path for the following description.
 
@@ -104,7 +104,7 @@ export async function generateDiagram(prompt: string): Promise<{
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' })
 
     const aiPrompt = `You are a system architecture diagram generator. Create a diagram based on the user's request.
 

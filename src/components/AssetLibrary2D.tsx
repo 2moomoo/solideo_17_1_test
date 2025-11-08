@@ -21,6 +21,8 @@ export default function AssetLibrary2D() {
   }
 
   const handleAssetClick = (asset: any) => {
+    console.log('AssetLibrary2D: Clicked asset', asset)
+
     // Create a new 2D node from the asset
     const newNode: DiagramNode = {
       id: `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -41,7 +43,10 @@ export default function AssetLibrary2D() {
         }
       }
     }
+
+    console.log('AssetLibrary2D: Created node', newNode)
     addNode(newNode)
+    console.log('AssetLibrary2D: Node added to store')
   }
 
   return (
