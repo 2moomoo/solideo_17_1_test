@@ -379,11 +379,21 @@ export const useAssetStore = create<AssetState>((set, get) => ({
     filteredAssets: [...state.filteredAssets, asset]
   })),
 
-  addStylePreset: (preset) => set((state) => ({
-    stylePresets: [...state.stylePresets, preset]
-  })),
+  addStylePreset: (preset) => set((state) => {
+    // Check if preset already exists
+    const exists = state.stylePresets.find(p => p.id === preset.id)
+    if (exists) {
+      console.log('Style preset already exists:', preset.id)
+      return state
+    }
+    console.log('Adding new style preset:', preset)
+    return {
+      stylePresets: [...state.stylePresets, preset]
+    }
+  }),
 
   setCurrentStyle: (styleId) => {
+    console.log('setCurrentStyle called with:', styleId)
     set({ currentStyleId: styleId })
     get().applyStyleToAssets(styleId)
   },
@@ -394,17 +404,27 @@ export const useAssetStore = create<AssetState>((set, get) => ({
 
     if (!style) return
 
+    console.log('Applying style to assets:', style)
+
     // Update assets with new geometry based on style
     const updatedAssets = assets.map(asset => {
-      const category = asset.category as keyof typeof style.categoryMappings
-      if (category in style.categoryMappings) {
+      // Don't apply style to AI Generated assets
+      if (asset.category === 'AI Generated') {
+        return asset
+      }
+
+      // Check if the asset's category exists in the style mappings
+      if (asset.category && asset.category in style.categoryMappings) {
+        const category = asset.category as keyof typeof style.categoryMappings
         const newGeometryType = style.categoryMappings[category]
+        console.log(`Asset ${asset.name}: ${asset.geometryType} -> ${newGeometryType}`)
         return {
           ...asset,
           geometryType: newGeometryType,
           geometryParams: getGeometryParams(newGeometryType)
         }
       }
+
       return asset
     })
 

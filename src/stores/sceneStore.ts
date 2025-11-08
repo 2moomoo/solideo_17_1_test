@@ -147,22 +147,36 @@ export const useSceneStore = create<SceneState>((set) => ({
   }),
 
   applyStyleToObjects: (style) => set((state) => {
+    console.log('Applying style to objects:', style)
+    console.log('Current objects:', state.objects)
+
     // Update objects with new geometry based on style
     const updatedObjects = state.objects.map(obj => {
-      if (!obj.category) return obj
+      console.log(`Processing object: ${obj.name}, category: ${obj.category}`)
 
-      const category = obj.category as keyof typeof style.categoryMappings
-      if (category in style.categoryMappings) {
+      // Don't apply style to AI Generated objects
+      if (obj.category === 'AI Generated') {
+        console.log('  -> Skipping AI Generated object')
+        return obj
+      }
+
+      // Check if the object's category exists in the style mappings
+      if (obj.category && obj.category in style.categoryMappings) {
+        const category = obj.category as keyof typeof style.categoryMappings
         const newGeometryType = style.categoryMappings[category]
+        console.log(`  -> Applying style: ${obj.geometryType} -> ${newGeometryType}`)
         return {
           ...obj,
           geometryType: newGeometryType,
           geometryParams: getGeometryParams(newGeometryType)
         }
       }
+
+      console.log('  -> No style mapping found')
       return obj
     })
 
+    console.log('Updated objects:', updatedObjects)
     return { objects: updatedObjects }
   })
 }))

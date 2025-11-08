@@ -35,11 +35,37 @@ function OrbitControlsWrapper() {
   )
 }
 
+// Component to handle ESC key press for deselection
+function KeyboardHandler() {
+  const { clearSelection } = useSceneStore()
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        clearSelection()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [clearSelection])
+
+  return null
+}
+
 export default function Viewport3D() {
-  const { sceneSettings } = useSceneStore()
+  const { sceneSettings, clearSelection } = useSceneStore()
+
+  const handleCanvasClick = (e: any) => {
+    // Only clear selection if clicking directly on the canvas (not on objects)
+    // Check if the target is the canvas itself
+    if (e.target.tagName === 'CANVAS') {
+      clearSelection()
+    }
+  }
 
   return (
-    <div className="w-full h-full bg-gray-950">
+    <div className="w-full h-full bg-gray-950" onClick={handleCanvasClick}>
       <Canvas
         shadows
         gl={{ preserveDrawingBuffer: true }}
@@ -88,6 +114,9 @@ export default function Viewport3D() {
 
         {/* Camera View Controller */}
         <CameraController />
+
+        {/* Keyboard Handler */}
+        <KeyboardHandler />
       </Canvas>
     </div>
   )
